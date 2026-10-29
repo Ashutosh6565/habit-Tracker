@@ -502,7 +502,7 @@ const Analytics = () => {
                         <ResponsiveContainer width="100%" height={240}>
                           <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="90%" data={templateRadialData} startAngle={180} endAngle={0}>
                             <RadialBar dataKey="rate" background={{ fill: "hsl(var(--secondary))" }} cornerRadius={8} />
-                            <Legend iconSize={8} formatter={(value, entry: { payload?: { name?: string } }) => <span className="text-xs text-muted-foreground">{entry.payload?.name || value}</span>} />
+                            <Legend iconSize={8} formatter={(value, entry) => <span className="text-xs text-muted-foreground">{(entry.payload as { name?: string } | undefined)?.name || value}</span>} />
                             <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "12px", fontSize: 12 }} />
                           </RadialBarChart>
                         </ResponsiveContainer>

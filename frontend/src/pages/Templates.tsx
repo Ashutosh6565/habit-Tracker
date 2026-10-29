@@ -77,7 +77,7 @@ const Templates = () => {
   const [templateSearch, setTemplateSearch] = useState("");
   const [showCount, setShowCount] = useState(12);
   const [loadingData, setLoadingData] = useState(true);
-  const [savingRef] = useState<{ timeout: NodeJS.Timeout | null }>({ timeout: null });
+  const [savingRef] = useState<{ timeout: ReturnType<typeof setTimeout> | null }>({ timeout: null });
 
   const selected = catalog.find((t) => t.templateId === selectedId);
 

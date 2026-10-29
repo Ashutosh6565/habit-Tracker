@@ -12,7 +12,9 @@ const topics = [
   { value: "bug", label: "Report a bug", icon: Bug },
   { value: "feature", label: "Feature request", icon: Lightbulb },
   { value: "press", label: "Press & partnerships", icon: Newspaper },
-];
+] as const;
+
+type Topic = (typeof topics)[number]["value"];
 
 const contactEmail = "support@habbiters.app";
 
@@ -21,7 +23,7 @@ const Contact = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [topic, setTopic] = useState<"general" | "billing" | "bug" | "feature" | "press">("general");
+  const [topic, setTopic] = useState<Topic>("general");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
