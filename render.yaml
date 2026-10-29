@@ -45,8 +45,6 @@ services:
         sync: false
       - key: SMTP_FROM
         value: Habbiters <no-reply@habbiters.app>
-      - key: BREVO_API_KEY
-        sync: false
       - key: SUPPORT_EMAIL
         value: support@habbiters.app
       - key: CONTACT_INBOX
@@ -54,10 +52,6 @@ services:
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
-        sync: false
-      - key: RAZORPAY_PAYMENT_LINK
-        sync: false
-      - key: GOOGLE_CLIENT_ID
         sync: false
       - key: ADMIN_EMAIL
         sync: false
