@@ -85,7 +85,7 @@ cd mobile/android && ./gradlew.bat bundleRelease
 4. Upload graphics:
    - App icon: use `mobile/assets/icon-only.png` (512×512 version is generated automatically by Play — upload the 1024×1024 source).
    - Feature graphic: 1024×500 (make a simple green banner with the flame + "Habbiters").
-   - Phone screenshots: at least 2, taken from the app on a phone (Today, Time, Analytics, Tasks, Calendar).
+   - Phone screenshots: at least 2, taken from the app on a phone (Today with the Momentum card, Templates, Time, Analytics, Tasks).
 5. **Privacy policy URL:** `https://habbiters.app/privacy`
    (or `https://habbiters-web.onrender.com/privacy` until the domain is connected).
 6. **Account deletion URL:** `https://habbiters.app/delete-account`

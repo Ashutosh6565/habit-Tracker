@@ -8,8 +8,10 @@ import {
   type PlannerNoteDto,
   type PlannerTaskDto,
   type PlannerTimeDto,
+  type TemplateCatalogDto,
 } from "@/lib/api";
 import { shiftISO, todayISO } from "./date";
+import { templateCategory } from "./templates";
 
 export type HabitSummary = { habits: ApiHabit[]; stats: Record<string, number> };
 
@@ -31,6 +33,7 @@ interface MobileDataValue {
   summary?: HabitSummary;
   history?: HabitHistoryDto;
   analytics?: AnalyticsOverviewDto;
+  templates?: TemplateCatalogDto[];
   tasks: PlannerTaskDto[];
   notes: PlannerNoteDto[];
   time?: PlannerTimeDto;
@@ -39,6 +42,7 @@ interface MobileDataValue {
   notify: (message: string) => void;
   toggleHabit: (habit: ApiHabit) => void;
   createHabit: (draft: HabitDraft) => Promise<void>;
+  applyTemplate: (template: TemplateCatalogDto, habits: { name: string; icon: string }[]) => Promise<number>;
   toggleTask: (task: PlannerTaskDto) => void;
   addTask: (draft: TaskDraft) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -74,6 +78,12 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     queryKey: ["hb", "analytics"],
     queryFn: () => api.analytics.overview(),
     staleTime: 60_000,
+  });
+
+  const templatesQuery = useQuery({
+    queryKey: ["hb", "templates"],
+    queryFn: async () => (await api.templates.catalog()).templates,
+    staleTime: 10 * 60_000,
   });
 
   const tasksQuery = useQuery({
@@ -135,6 +145,21 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       notify("Habit added");
     },
     onError: () => notify("Could not add that habit."),
+  });
+
+  const applyTemplateMutation = useMutation({
+    mutationFn: async ({ template, habits }: { template: TemplateCatalogDto; habits: { name: string; icon: string }[] }) => {
+      const category = templateCategory(template);
+      for (const habit of habits) {
+        await api.habits.create({ title: habit.name, category, icon: habit.icon, difficulty: "easy" });
+      }
+      return habits.length;
+    },
+    onSuccess: (count) => {
+      refreshDerived();
+      notify(`${count} ${count === 1 ? "habit" : "habits"} added from template`);
+    },
+    onError: () => notify("Could not add that template. Try again."),
   });
 
   const taskToggleMutation = useMutation({
@@ -200,6 +225,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       summary: summaryQuery.data,
       history: historyQuery.data,
       analytics: analyticsQuery.data,
+      templates: templatesQuery.data,
       tasks: tasksQuery.data || [],
       notes: notesQuery.data || [],
       time: timeQuery.data,
@@ -208,6 +234,8 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       notify,
       toggleHabit: (habit) => toggleMutation.mutate({ habit }),
       createHabit: (draft) => createHabitMutation.mutateAsync(draft).then(() => undefined),
+      applyTemplate: (template, habits) =>
+        applyTemplateMutation.mutateAsync({ template, habits }).then((count) => count),
       toggleTask: (task) => taskToggleMutation.mutate(task),
       addTask: (draft) => addTaskMutation.mutateAsync(draft).then(() => undefined),
       deleteTask: (id) => deleteTaskMutation.mutateAsync(id).then(() => undefined),
@@ -219,6 +247,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       summaryQuery.data,
       historyQuery.data,
       analyticsQuery.data,
+      templatesQuery.data,
       tasksQuery.data,
       notesQuery.data,
       timeQuery.data,
@@ -227,6 +256,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       notify,
       toggleMutation,
       createHabitMutation,
+      applyTemplateMutation,
       taskToggleMutation,
       addTaskMutation,
       deleteTaskMutation,

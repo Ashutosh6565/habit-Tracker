@@ -12,9 +12,10 @@ import { TimeScreen } from "./TimeScreen";
 import { AnalyticsScreen } from "./AnalyticsScreen";
 import { TasksScreen } from "./TasksScreen";
 import { CalendarScreen } from "./CalendarScreen";
+import { TemplatesScreen } from "./TemplatesScreen";
 import "./mobile.css";
 
-type Screen = "today" | "time" | "analytics" | "tasks" | "calendar";
+type Screen = "today" | "time" | "analytics" | "tasks" | "calendar" | "templates";
 type AddSheet = { type: "habit" } | { type: "task"; date: string } | { type: "note"; date: string };
 
 const Splash = ({ label }: { label: string }) => (
@@ -32,7 +33,7 @@ const Splash = ({ label }: { label: string }) => (
   </div>
 );
 
-const HabitSheet = ({ onClose }: { onClose: () => void }) => {
+const HabitSheet = ({ onClose, onBrowseTemplates }: { onClose: () => void; onBrowseTemplates: () => void }) => {
   const { createHabit } = useMobileData();
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<string>("Health");
@@ -53,6 +54,14 @@ const HabitSheet = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <Sheet title="New habit" onClose={onClose}>
+      <button type="button" className="hb-template-link" onClick={onBrowseTemplates}>
+        <span className="hb-template-link-icon">✨</span>
+        <span className="hb-template-link-copy">
+          <strong>Not sure what to track?</strong>
+          Start from one of 105 proven templates
+        </span>
+        <span className="hb-template-link-arrow">Browse →</span>
+      </button>
       <span className="hb-sheet-label">What do you want to build?</span>
       <input
         className="hb-input"
@@ -212,6 +221,7 @@ const MobileShell = () => {
   const [accountOpen, setAccountOpen] = useState(false);
   const [addSheet, setAddSheet] = useState<AddSheet | null>(null);
   const [timeSignal, setTimeSignal] = useState(0);
+  const [templatesFocus, setTemplatesFocus] = useState<string | null>(null);
 
   useEffect(() => {
     setAndroidBackHandler(() => {
@@ -235,6 +245,12 @@ const MobileShell = () => {
   const go = (next: Screen) => {
     tapFeedback();
     setScreen(next);
+  };
+
+  const openTemplates = (templateId?: string) => {
+    tapFeedback();
+    setTemplatesFocus(templateId || null);
+    setScreen("templates");
   };
 
   const openAdd = () => {
@@ -263,6 +279,9 @@ const MobileShell = () => {
               onOpenTime={() => go("time")}
               onOpenAccount={() => setAccountOpen(true)}
               onAddHabit={() => setAddSheet({ type: "habit" })}
+              onOpenTemplates={() => openTemplates()}
+              onOpenTemplate={(templateId) => openTemplates(templateId)}
+              onOpenTasks={() => go("tasks")}
             />
           )}
           {screen === "time" && <TimeScreen onBack={() => go("today")} onOpenCalendar={() => go("calendar")} addSignal={timeSignal} />}
@@ -274,6 +293,15 @@ const MobileShell = () => {
             />
           )}
           {screen === "calendar" && <CalendarScreen onAddNote={(date) => setAddSheet({ type: "note", date })} />}
+          {screen === "templates" && (
+            <TemplatesScreen
+              initialTemplateId={templatesFocus}
+              onBack={() => {
+                setTemplatesFocus(null);
+                go("today");
+              }}
+            />
+          )}
         </div>
       </main>
 
@@ -310,7 +338,15 @@ const MobileShell = () => {
       {toast && <div className="hb-toast">{toast}</div>}
 
       {accountOpen && <AccountSheet onClose={() => setAccountOpen(false)} />}
-      {addSheet?.type === "habit" && <HabitSheet onClose={() => setAddSheet(null)} />}
+      {addSheet?.type === "habit" && (
+        <HabitSheet
+          onClose={() => setAddSheet(null)}
+          onBrowseTemplates={() => {
+            setAddSheet(null);
+            openTemplates();
+          }}
+        />
+      )}
       {addSheet?.type === "task" && <TaskSheet date={addSheet.date} onClose={() => setAddSheet(null)} />}
       {addSheet?.type === "note" && <NoteSheet date={addSheet.date} onClose={() => setAddSheet(null)} />}
     </div>

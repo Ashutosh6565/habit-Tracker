@@ -3,19 +3,28 @@ import { Bell, Check, ChevronRight, Flame } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { initials, lastNDays, todayISO, weekOf } from "./date";
 import { DotRow, Loading, Ring, Sheet, WeekStrip } from "./shared";
+import { MomentumCard } from "./MomentumCard";
+import { buildMomentumSeries, computeMomentum, nextMoveFor } from "./momentum";
+import { templateEmoji } from "./templates";
 import { useMobileData } from "./useMobileData";
 
 export const TodayScreen = ({
   onOpenTime,
   onOpenAccount,
   onAddHabit,
+  onOpenTemplates,
+  onOpenTemplate,
+  onOpenTasks,
 }: {
   onOpenTime: () => void;
   onOpenAccount: () => void;
   onAddHabit: () => void;
+  onOpenTemplates: () => void;
+  onOpenTemplate: (templateId: string) => void;
+  onOpenTasks: () => void;
 }) => {
   const { user } = useAuth();
-  const { summary, history, tasks, time, isLoading, toggleHabit, notify } = useMobileData();
+  const { summary, history, tasks, time, templates, isLoading, toggleHabit, notify } = useMobileData();
   const [category, setCategory] = useState("All");
   const [showGlance, setShowGlance] = useState(false);
 
@@ -46,6 +55,22 @@ export const TodayScreen = ({
   const completion = summary?.stats.completionPercentage || 0;
   const firstName = (user?.fullName || "friend").split(" ")[0];
   const completedTasks = todayTasks.filter((task) => task.completed).length;
+  const bestStreak = summary?.stats.bestStreak || 0;
+
+  const momentumInput = {
+    habitsDone: done,
+    habitsTotal: total,
+    tasksDone: completedTasks,
+    tasksTotal: todayTasks.length,
+    focusHours,
+    bestStreak,
+  };
+  const momentum = computeMomentum(momentumInput);
+  const move = nextMoveFor(momentumInput, momentum);
+  const momentumDays = useMemo(
+    () => buildMomentumSeries({ history, tasks, time, bestStreak }),
+    [history, tasks, time, bestStreak]
+  );
 
   const historyFor = (habitId: string) => new Set(history?.habits.find((row) => row.id === habitId)?.dates || []);
 
@@ -85,6 +110,43 @@ export const TodayScreen = ({
         <Ring value={completion / 100} display={`${completion}%`} label="Today" tone="blue" />
       </div>
 
+      <MomentumCard
+        breakdown={momentum}
+        series={momentumDays}
+        move={move}
+        onOpenTime={onOpenTime}
+        onOpenTasks={onOpenTasks}
+        onOpenTemplates={onOpenTemplates}
+      />
+
+      {!!templates?.length && (
+        <div className="hb-rail-block">
+          <div className="hb-rail-head">
+            <div>
+              <span className="hb-kicker">Start in one tap</span>
+              <strong>{templates.length} free templates</strong>
+            </div>
+            <button type="button" className="hb-rail-all" onClick={onOpenTemplates}>
+              See all →
+            </button>
+          </div>
+          <div className="hb-rail">
+            {templates.slice(0, 5).map((template) => (
+              <button
+                key={template.templateId}
+                type="button"
+                className="hb-rail-card"
+                onClick={() => onOpenTemplate(template.templateId)}
+              >
+                <span className="hb-rail-icon">{templateEmoji(template)}</span>
+                <span className="hb-rail-name">{template.name}</span>
+                <span className="hb-rail-meta">{template.habits.length} habits · free</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="hb-chips">
         {categories.map((item) => (
           <button
@@ -103,10 +165,23 @@ export const TodayScreen = ({
       ) : habits.length === 0 ? (
         <div className="hb-empty">
           <strong>No habits here yet</strong>
-          Add your first habit and start a streak today.
-          <div style={{ marginTop: 14 }}>
-            <button type="button" className="hb-btn-primary" onClick={onAddHabit}>
-              Add a habit
+          Start from a proven template, or write your own habit.
+          <div style={{ marginTop: 14, display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="hb-btn-primary"
+              style={{ width: "auto", margin: 0, padding: "12px 18px" }}
+              onClick={onOpenTemplates}
+            >
+              Browse 105 templates
+            </button>
+            <button
+              type="button"
+              className="hb-btn-ghost"
+              style={{ width: "auto", margin: 0, padding: "12px 18px" }}
+              onClick={onAddHabit}
+            >
+              Create your own
             </button>
           </div>
         </div>

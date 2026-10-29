@@ -13,9 +13,9 @@ Habbiters: Habit Tracker
 ## Short description (max 80)
 
 ```
-Free habit tracker with streaks, XP, planner and 105 templates.
+Free habit tracker with Momentum score, streaks and 105 templates.
 ```
-63 characters.
+66 characters.
 
 ## Full description (max 4000)
 
@@ -24,11 +24,17 @@ Habbiters is a free habit tracker that makes showing up feel good. Pick a habit,
 
 No paywall. No trial. Every habit, every template, every screen is free.
 
+MOMENTUM — THE SCORE THAT SEES YOUR WHOLE DAY
+Most trackers reduce your day to a single checkbox. Momentum blends your habits, tasks and focused hours into one honest score from 0 to 100. It shows your last seven days, tells you how you moved since yesterday, and always names the next best move — the one action that lifts your score right now. One missed habit never defines your day.
+
+START FROM A PROVEN ROUTINE
+105 free templates for fitness, study, focus, sleep, money and daily discipline. Open one, choose the habits you want, and they land in your tracker in one tap. Mix habits from several routines if that is what your life looks like.
+
 WHAT YOU CAN DO
-• Today dashboard — greet the day, see your week at a glance, and tap a habit to check it in
+• Today dashboard — greet the day, see the Momentum score, your week at a glance, and tap a habit to check it in
+• One-tap templates — 105 routines, free, ready to become your habits
 • Streaks that survive real life — miss a day, keep the habit, start again
 • XP, levels and achievements for every completion
-• 105 free habit templates for fitness, study, focus, sleep, money and daily discipline
 • Weekly time tracker — log focused hours in a simple 7-day grid
 • Analytics that tell the truth — consistency, best days, time invested and trends
 • Tasks with a time-ordered timeline, grouped by category
@@ -46,7 +52,7 @@ Habit building is hard enough without your tools working against your wallet. Ha
 
 Habbiters is made for people who are tired of starting over.
 ```
-1,585 characters.
+2,362 characters.
 
 ## Category
 
@@ -74,16 +80,16 @@ description above. Keep this list as the reference for graphics text and future 
 | --- | --- | --- |
 | App icon | 512×512 PNG, no transparency | `mobile/assets/icon-only.png` (export to 512) |
 | Feature graphic | 1024×500 PNG/JPG | Green background, flame logo, "Habbiters" in the display font |
-| Phone screenshots | 2–8, 16:9 or 9:16, min 320px | Today, Time, Analytics, Tasks, Calendar |
+| Phone screenshots | 2–8, 16:9 or 9:16, min 320px | Today (with Momentum), Templates, Time, Analytics, Tasks |
 | Tablet screenshots | Optional | Same screens at 10" |
 
 Screenshot captions (optional but strong for ASO):
 
-1. Today — "Your whole week in one glance"
-2. Time — "See where your hours actually go"
-3. Analytics — "Honest streaks and trends"
-4. Tasks — "A day that runs in order"
-5. Calendar — "Notes and momentum, side by side"
+1. Today — "Momentum: one score for your whole day"
+2. Templates — "105 routines, free — add one in a tap"
+3. Time — "See where your hours actually go"
+4. Analytics — "Honest streaks and trends"
+5. Tasks — "A day that runs in order"
 
 ## What to avoid in the listing
 
