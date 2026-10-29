@@ -13,7 +13,7 @@ services:
     buildCommand: npm install --include=dev --no-audit --no-fund && npm run build
     startCommand: npm start
     healthCheckPath: /health
-    autoDeploy: true
+    autoDeployTrigger: commit
     envVars:
       - key: NODE_VERSION
         value: 22.11.0
@@ -64,7 +64,7 @@ services:
     rootDir: frontend
     buildCommand: npm install --include=dev --no-audit --no-fund && npm run build
     staticPublishPath: dist
-    autoDeploy: true
+    autoDeployTrigger: commit
     envVars:
       - key: VITE_API_URL
         value: https://habbiters-api.onrender.com/api/v1
