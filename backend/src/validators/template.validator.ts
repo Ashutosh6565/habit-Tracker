@@ -10,7 +10,7 @@ export const upsertTemplateProgressSchema = z.object({
   templateId: z.string().min(1).max(120),
   templateName: z.string().min(1).max(160),
   habits: z.array(templateHabitSchema).min(1).max(100),
-  completions: z.record(z.record(z.coerce.number(), z.boolean())),
+  completions: z.record(z.string(), z.record(z.coerce.number(), z.boolean())),
   totalDays: z.number().int().min(1).max(366),
   moodRatings: z.record(z.coerce.number(), z.number().int().min(1).max(10)).optional(),
   notes: z.string().max(4000).optional(),
