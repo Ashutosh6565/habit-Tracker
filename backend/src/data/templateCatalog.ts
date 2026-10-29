@@ -184,7 +184,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "c6", name: "Learn New Technique", icon: "🔧" },
       { habitId: "c7", name: "Share Creation", icon: "🌐" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 7,
   },
   {
@@ -205,7 +205,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "d6", name: "Code Review", icon: "🔍" },
       { habitId: "d7", name: "Build Side Project", icon: "🚀" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 8,
   },
   {
@@ -226,7 +226,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "e6", name: "Compost Waste", icon: "🪴" },
       { habitId: "e7", name: "Buy Local", icon: "🏪" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 9,
   },
   {
@@ -283,7 +283,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ps4", name: "Voice Exercises", icon: "🗣️" },
       { habitId: "ps5", name: "Improvisation Drill", icon: "🎭" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 12,
   },
   {
@@ -302,7 +302,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ll4", name: "Write 5 Sentences", icon: "✍️" },
       { habitId: "ll5", name: "Speak Aloud 10 min", icon: "🗣️" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 13,
   },
   {
@@ -321,7 +321,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "mu4", name: "Record & Review", icon: "🎙️" },
       { habitId: "mu5", name: "Music Theory", icon: "📖" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 14,
   },
   {
@@ -340,7 +340,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ph4", name: "Post to Portfolio", icon: "🌐" },
       { habitId: "ph5", name: "Try New Technique", icon: "🔍" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 15,
   },
   {
@@ -359,7 +359,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ck4", name: "Meal Plan", icon: "🗒️" },
       { habitId: "ck5", name: "Clean as You Go", icon: "✨" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 16,
   },
   {
@@ -378,7 +378,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ae4", name: "Group Study 1hr", icon: "👥" },
       { habitId: "ae5", name: "Office Hours Visit", icon: "🧑‍🏫" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 17,
   },
   {
@@ -397,7 +397,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "mt4", name: "Nutrition Plan", icon: "🍌" },
       { habitId: "mt5", name: "Rest & Recovery", icon: "💤" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 18,
   },
   {
@@ -416,7 +416,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "wl4", name: "Weigh In", icon: "⚖️" },
       { habitId: "wl5", name: "Drink Water", icon: "💧" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 19,
   },
   {
@@ -435,7 +435,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "mb4", name: "Progressive Overload", icon: "📈" },
       { habitId: "mb5", name: "Creatine & Supps", icon: "💊" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 20,
   },
   {
@@ -454,7 +454,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "yj4", name: "Flexibility Work", icon: "🤸" },
       { habitId: "yj5", name: "Savasana 10 min", icon: "🛌" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 21,
   },
   {
@@ -511,7 +511,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "dm4", name: "Analog Activity", icon: "🎨" },
       { habitId: "dm5", name: "App Audit", icon: "🔍" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 24,
   },
   {
@@ -530,7 +530,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ff4", name: "Read Finance Book", icon: "📕" },
       { habitId: "ff5", name: "Review Investments", icon: "📈" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 25,
   },
   {
@@ -549,7 +549,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sf4", name: "Content Marketing", icon: "✍️" },
       { habitId: "sf5", name: "Founder Fitness", icon: "💪" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 26,
   },
   {
@@ -568,7 +568,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "rw4", name: "Walk Break", icon: "🚶" },
       { habitId: "rw5", name: "End-of-Day Shutdown", icon: "🔌" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 27,
   },
   {
@@ -587,7 +587,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ss4", name: "Body Language Check", icon: "🧍" },
       { habitId: "ss5", name: "Follow Up with Friend", icon: "📱" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 28,
   },
   {
@@ -606,7 +606,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "np4", name: "Partner Check-In", icon: "❤️" },
       { habitId: "np5", name: "5 min Meditation", icon: "🧘" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 29,
   },
   {
@@ -625,7 +625,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "pc4", name: "Vet Check Reminder", icon: "🏥" },
       { habitId: "pc5", name: "Quality Playtime", icon: "🎾" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 30,
   },
   {
@@ -644,7 +644,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ho4", name: "Trail Research", icon: "🗺️" },
       { habitId: "ho5", name: "Gear Maintenance", icon: "🎒" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 31,
   },
   {
@@ -663,7 +663,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "cy4", name: "Hydration Check", icon: "💧" },
       { habitId: "cy5", name: "Recovery Stretch", icon: "🧘" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 32,
   },
   {
@@ -682,7 +682,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "df4", name: "Brain Dump Notes", icon: "🧠" },
       { habitId: "df5", name: "Reward After Focus", icon: "🎁" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 33,
   },
   {
@@ -701,7 +701,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "tm4", name: "Say No to 1 Thing", icon: "🚫" },
       { habitId: "tm5", name: "End-of-Day Review", icon: "📊" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 34,
   },
   {
@@ -720,7 +720,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "cb4", name: "Eye Contact Practice", icon: "👁️" },
       { habitId: "cb5", name: "Celebrate a Win", icon: "🎉" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 35,
   },
   {
@@ -739,7 +739,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sm4", name: "Nature Break", icon: "🌿" },
       { habitId: "sm5", name: "Limit News Intake", icon: "📰" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 36,
   },
   {
@@ -758,7 +758,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "wh4", name: "Writing Prompt", icon: "💡" },
       { habitId: "wh5", name: "Submit/Publish", icon: "📤" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 37,
   },
   {
@@ -777,7 +777,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "pc4a", name: "Engage Listeners", icon: "💬" },
       { habitId: "pc5a", name: "Promote on Social", icon: "📱" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 38,
   },
   {
@@ -796,7 +796,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ds4", name: "Dribbble Inspiration", icon: "🎨" },
       { habitId: "ds5", name: "Typography Practice", icon: "🔤" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 39,
   },
   {
@@ -815,7 +815,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "da4", name: "Read Research Paper", icon: "📄" },
       { habitId: "da5", name: "Build a Model", icon: "🤖" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 40,
   },
   {
@@ -834,7 +834,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "cs4", name: "Backup Data", icon: "💾" },
       { habitId: "cs5", name: "Review Permissions", icon: "🔒" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 41,
   },
   {
@@ -853,7 +853,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "re4", name: "Financial Review", icon: "💰" },
       { habitId: "re5", name: "Learn Regulations", icon: "📜" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 42,
   },
   {
@@ -872,7 +872,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "dr4", name: "Copy a Master", icon: "🎨" },
       { habitId: "dr5", name: "Post to Community", icon: "🌐" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 43,
   },
   {
@@ -891,7 +891,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "cc4", name: "Plan Content Calendar", icon: "📅" },
       { habitId: "cc5", name: "Collab Outreach", icon: "🤝" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 44,
   },
   {
@@ -910,7 +910,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "fl4", name: "Skill Upgrade", icon: "📚" },
       { habitId: "fl5", name: "Network Online", icon: "🌐" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 45,
   },
   {
@@ -929,7 +929,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ml4", name: "Digital Cleanup", icon: "🗂️" },
       { habitId: "ml5", name: "Gratitude for What I Have", icon: "🙏" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 46,
   },
   {
@@ -948,7 +948,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ld4", name: "Strategic Thinking", icon: "♟️" },
       { habitId: "ld5", name: "Lead a Meeting", icon: "🏛️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 47,
   },
   {
@@ -967,7 +967,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ip4", name: "Technical Practice", icon: "💻" },
       { habitId: "ip5", name: "Elevator Pitch", icon: "🚀" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 48,
   },
   {
@@ -986,7 +986,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "hs4", name: "Lunch + Walk", icon: "🚶" },
       { habitId: "hs5", name: "Dinner + No Screen", icon: "🍽️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 49,
   },
   {
@@ -1005,7 +1005,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ar4", name: "Progressive Relaxation", icon: "🧘" },
       { habitId: "ar5", name: "Positive Reframe", icon: "🌈" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 50,
   },
   {
@@ -1043,7 +1043,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "md4", name: "Body Scan", icon: "🫀" },
       { habitId: "md5", name: "Loving-Kindness", icon: "💕" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 52,
   },
   {
@@ -1062,7 +1062,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "vg4", name: "Meal Prep Sunday", icon: "🍱" },
       { habitId: "vg5", name: "B12 & Supps", icon: "💊" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 53,
   },
   {
@@ -1081,7 +1081,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ct4", name: "Track Temperature", icon: "🌡️" },
       { habitId: "ct5", name: "Log How You Feel", icon: "📝" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 54,
   },
   {
@@ -1100,7 +1100,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "st4", name: "Journal Reflections", icon: "📝" },
       { habitId: "st5", name: "Evening Review", icon: "🌙" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 55,
   },
   {
@@ -1119,7 +1119,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "rl4", name: "Plan a Date", icon: "❤️" },
       { habitId: "rl5", name: "Listen Without Judging", icon: "👂" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 56,
   },
   {
@@ -1138,7 +1138,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "hg4", name: "Laundry Routine", icon: "👕" },
       { habitId: "hg5", name: "Meal Prep Area Clean", icon: "✨" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 57,
   },
   {
@@ -1157,7 +1157,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "gd4", name: "Garden Journal", icon: "📝" },
       { habitId: "gd5", name: "Harvest & Enjoy", icon: "🌻" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 58,
   },
   {
@@ -1176,7 +1176,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "cm4", name: "Analyze a Game", icon: "🔍" },
       { habitId: "cm5", name: "Endgame Practice", icon: "🏆" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 59,
   },
   {
@@ -1195,7 +1195,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sw4", name: "Flexibility Work", icon: "🤸" },
       { habitId: "sw5", name: "Visualize Technique", icon: "🧠" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 60,
   },
   {
@@ -1214,7 +1214,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "bx4", name: "Conditioning", icon: "🔥" },
       { habitId: "bx5", name: "Watch Fight Film", icon: "🎬" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 61,
   },
   {
@@ -1233,7 +1233,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "3d4", name: "Render a Scene", icon: "🖼️" },
       { habitId: "3d5", name: "Community Feedback", icon: "💬" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 62,
   },
   {
@@ -1252,7 +1252,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "gv4", name: "Playtest & Debug", icon: "🐛" },
       { habitId: "gv5", name: "Dev Log Entry", icon: "📝" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 63,
   },
   {
@@ -1271,7 +1271,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ve4", name: "Sound Design", icon: "🔊" },
       { habitId: "ve5", name: "Export & Review", icon: "📤" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 64,
   },
   {
@@ -1290,7 +1290,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "pfm4", name: "Outdoor Walk", icon: "🌅" },
       { habitId: "pfm5", name: "Mindful Breakfast", icon: "🥣" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 65,
   },
   {
@@ -1309,7 +1309,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "iv4", name: "DCA Contribution", icon: "💸" },
       { habitId: "iv5", name: "Learn New Strategy", icon: "📖" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 66,
   },
   {
@@ -1328,7 +1328,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "nw4", name: "Attend 1 Event/Month", icon: "🎪" },
       { habitId: "nw5", name: "Follow Up Email", icon: "📧" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 67,
   },
   {
@@ -1347,7 +1347,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sb4", name: "Exercise", icon: "🏃" },
       { habitId: "sb5", name: "Celebrate Milestones", icon: "🎉" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 68,
   },
   {
@@ -1366,7 +1366,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "bt4", name: "Mental Math", icon: "🔢" },
       { habitId: "bt5", name: "Strategy Game", icon: "♟️" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 69,
   },
   {
@@ -1385,7 +1385,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sk4", name: "Serum/Treatment", icon: "💎" },
       { habitId: "sk5", name: "Drink Water", icon: "💧" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 70,
   },
   {
@@ -1404,7 +1404,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "po4", name: "Hip Flexor Stretch", icon: "🧘" },
       { habitId: "po5", name: "Walk Tall", icon: "🚶" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 71,
   },
   {
@@ -1423,7 +1423,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sp4", name: "Flashcards 50", icon: "🃏" },
       { habitId: "sp5", name: "Think in Spanish", icon: "💭" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 72,
   },
   {
@@ -1442,7 +1442,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "pn4", name: "Sight Reading", icon: "📖" },
       { habitId: "pn5", name: "Record & Listen", icon: "🎙️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 73,
   },
   {
@@ -1461,7 +1461,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "dx4", name: "Dry Brushing", icon: "🧹" },
       { habitId: "dx5", name: "Sweat Session", icon: "💦" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 74,
   },
   {
@@ -1480,7 +1480,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "aw4", name: "Avoid Inner Critic", icon: "🛡️" },
       { habitId: "aw5", name: "Inspiration Walk", icon: "🚶" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 75,
   },
   {
@@ -1499,7 +1499,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "zw4", name: "Compost", icon: "🌿" },
       { habitId: "zw5", name: "Repair Don't Replace", icon: "🔧" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 76,
   },
   {
@@ -1518,7 +1518,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sh4", name: "Track Revenue", icon: "💰" },
       { habitId: "sh5", name: "Learn Business Skill", icon: "📚" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 77,
   },
   {
@@ -1537,7 +1537,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "prk4", name: "Get Peer Feedback", icon: "💬" },
       { habitId: "prk5", name: "Study TED Talks", icon: "🎤" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 78,
   },
   {
@@ -1556,7 +1556,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "diy4", name: "Organize Tools", icon: "🧰" },
       { habitId: "diy5", name: "Document Progress", icon: "📸" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 79,
   },
   {
@@ -1575,7 +1575,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ep4", name: "Spaced Repetition", icon: "🔄" },
       { habitId: "ep5", name: "Rest & Recovery", icon: "😌" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 80,
   },
   {
@@ -1594,7 +1594,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "hh4", name: "Physical Movement", icon: "🏃" },
       { habitId: "hh5", name: "Savoring Moment", icon: "☀️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 81,
   },
   {
@@ -1613,7 +1613,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "nl4", name: "Engage with Readers", icon: "💬" },
       { habitId: "nl5", name: "Analyze Open Rates", icon: "📊" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 82,
   },
   {
@@ -1632,7 +1632,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "fa4", name: "Fire Safety Check", icon: "🔥" },
       { habitId: "fa5", name: "Emergency Contacts Updated", icon: "📱" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 83,
   },
   {
@@ -1651,7 +1651,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "bg4", name: "Teach Someone", icon: "🧑‍🏫" },
       { habitId: "bg5", name: "Game Night Planning", icon: "🎉" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 84,
   },
   {
@@ -1670,7 +1670,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "vol4", name: "Spread Awareness", icon: "📢" },
       { habitId: "vol5", name: "Mentor Youth", icon: "👦" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 85,
   },
   {
@@ -1689,7 +1689,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "tp4", name: "Packing Checklist", icon: "🧳" },
       { habitId: "tp5", name: "Book Accommodations", icon: "🏨" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 86,
   },
   {
@@ -1708,7 +1708,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sd4", name: "No Complaining", icon: "🤐" },
       { habitId: "sd5", name: "Delayed Gratification", icon: "⏳" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 87,
   },
   {
@@ -1727,7 +1727,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "sg4", name: "Respond to DMs", icon: "📩" },
       { habitId: "sg5", name: "Track Analytics", icon: "📊" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 88,
   },
   {
@@ -1746,7 +1746,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "par4", name: "Patience Practice", icon: "🧘" },
       { habitId: "par5", name: "Family Meeting", icon: "👨‍👩‍👧‍👦" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 89,
   },
   {
@@ -1765,7 +1765,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "em4", name: "Archive Old Emails", icon: "🗂️" },
       { habitId: "em5", name: "Zero Inbox End of Day", icon: "✅" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 90,
   },
   {
@@ -1784,7 +1784,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "rn4", name: "Stretch & Cool Down", icon: "🧘" },
       { habitId: "rn5", name: "Rest Day (Active Recovery)", icon: "🚶" },
     ],
-    unlockTier: "starter",
+    unlockTier: "free",
     sortOrder: 91,
   },
   {
@@ -1803,7 +1803,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ca4", name: "Educate Someone", icon: "📢" },
       { habitId: "ca5", name: "Support Green Brand", icon: "🏷️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 92,
   },
   {
@@ -1822,7 +1822,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "dn4", name: "Record & Review", icon: "📹" },
       { habitId: "dn5", name: "Cross-Train", icon: "🏋️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 93,
   },
   {
@@ -1841,7 +1841,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "ww4", name: "Plan Next Project", icon: "📝" },
       { habitId: "ww5", name: "Safety Check", icon: "🦺" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 94,
   },
   {
@@ -1860,7 +1860,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "mh4", name: "Do Something Enjoyable", icon: "🎉" },
       { habitId: "mh5", name: "Screen-Free Hour", icon: "📵" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 95,
   },
   {
@@ -1879,7 +1879,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "spl4", name: "Active Recall Test", icon: "📝" },
       { habitId: "spl5", name: "Teach What You Learned", icon: "🗣️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 96,
   },
   {
@@ -1898,7 +1898,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "fs4", name: "Fix/Replace Broken Item", icon: "🔧" },
       { habitId: "fs5", name: "Rearrange for Flow", icon: "🌀" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 97,
   },
   {
@@ -1917,7 +1917,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "cal4", name: "Handstand Work", icon: "🙃" },
       { habitId: "cal5", name: "Mobility Flow", icon: "🧘" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 98,
   },
   {
@@ -1936,7 +1936,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "mw4", name: "Organize Photos", icon: "📸" },
       { habitId: "mw5", name: "Read a Memoir", icon: "📖" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 99,
   },
   {
@@ -1955,7 +1955,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "td4", name: "Paper Book Only", icon: "📕" },
       { habitId: "td5", name: "Screen Time Log", icon: "📊" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 100,
   },
   {
@@ -1974,7 +1974,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "slp4", name: "Blue Light Glasses", icon: "👓" },
       { habitId: "slp5", name: "Sleep Quality Score", icon: "📊" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 101,
   },
   {
@@ -1993,7 +1993,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "imp4", name: "Practice Timing", icon: "⏱️" },
       { habitId: "imp5", name: "Perform for Someone", icon: "🎤" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 102,
   },
   {
@@ -2012,7 +2012,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "rcl4", name: "Flexibility Work", icon: "🤸" },
       { habitId: "rcl5", name: "Route Reading", icon: "🗺️" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 103,
   },
   {
@@ -2031,7 +2031,7 @@ export const SEED_TEMPLATES: SeedTemplate[] = [
       { habitId: "clg4", name: "Ink & Paper Experimentation", icon: "🧪" },
       { habitId: "clg5", name: "Share on Social", icon: "📱" },
     ],
-    unlockTier: "premium",
+    unlockTier: "free",
     sortOrder: 104,
   },
 ];

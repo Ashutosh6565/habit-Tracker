@@ -15,7 +15,7 @@ export const perks = [
   { title: "Learning budget", desc: "₹50,000/year for courses, books, and conferences." },
   { title: "Wellness stipend", desc: "Gym, yoga, therapy — anything that keeps you healthy counts." },
   { title: "Annual retreat", desc: "Once a year the whole team meets somewhere beautiful." },
-  { title: "Free premium, forever", desc: "Unlimited Habbiters for you and your family." },
+  { title: "Habbiters for life", desc: "Every feature and template, free for you and your family." },
 ];
 
 export const openings: JobOpening[] = [
@@ -43,11 +43,11 @@ export const openings: JobOpening[] = [
     department: "Engineering",
     location: "Remote — India",
     type: "Full-time",
-    description: "Scale the APIs behind millions of habit check-ins and build the systems that keep streaks safe and payments flowing.",
+    description: "Scale the APIs behind millions of habit check-ins and build the systems that keep streaks, plans and notes safe.",
     responsibilities: [
       "Design and evolve REST APIs on Node.js + Express + MongoDB",
       "Own reliability: rate limiting, idempotency, observability",
-      "Integrate payments and billing (Razorpay experience a big plus)",
+      "Ship planner, analytics and sync features used every day by real people",
     ],
     requirements: [
       "3+ years building production APIs in Node.js/TypeScript",

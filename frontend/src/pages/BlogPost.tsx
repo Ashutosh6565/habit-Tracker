@@ -5,13 +5,19 @@ import { ArrowLeft, CalendarDays, Clock, Quote, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getBlogPost } from "@/data/blogPosts";
+import { applyMeta } from "@/lib/seo";
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? getBlogPost(slug) : undefined;
 
   useEffect(() => {
-    document.title = post ? `${post.title} — Habbiters Blog` : "Article not found — Habbiters";
+    if (post) {
+      applyMeta(`/blog/${post.slug}`, {
+        title: `${post.title} — Habbiters Blog`,
+        description: post.excerpt,
+      });
+    }
     window.scrollTo(0, 0);
   }, [post]);
 

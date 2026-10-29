@@ -12,6 +12,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AmbientBackground from "@/components/decor/AmbientBackground";
 import StickerField from "@/components/decor/StickerField";
 import { hideSplash, initNativeShell, isNativeApp } from "@/lib/native";
+import { usePageMeta } from "@/lib/seo";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Tracker from "./pages/Tracker";
@@ -19,7 +20,6 @@ import Learning from "./pages/Learning";
 import Templates from "./pages/Templates";
 import Analytics from "./pages/Analytics";
 import Gamification from "./pages/Gamification";
-import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
@@ -37,8 +37,15 @@ import Security from "./pages/Security";
 import DeleteAccount from "./pages/DeleteAccount";
 import NotFound from "./pages/NotFound";
 import HabitCoach from "./components/HabitCoach";
+import { MobileApp } from "./mobile/MobileApp";
 
 const queryClient = new QueryClient();
+
+const RouteMeta = () => {
+  const { pathname } = useLocation();
+  usePageMeta(pathname);
+  return null;
+};
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -53,6 +60,7 @@ const AnimatedRoutes = () => {
 
   return (
     <>
+      <RouteMeta />
       <AmbientBackground />
       <StickerField variant="ambient" position="fixed" className="-z-10" />
       <ScrollToTop />
@@ -72,7 +80,6 @@ const AnimatedRoutes = () => {
             <Route path="/templates" element={<ProtectedRoute permission="templates.view" guestAccess><Templates /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute permission="analytics.view"><Analytics /></ProtectedRoute>} />
             <Route path="/gamification" element={<ProtectedRoute permission="gamification.view"><Gamification /></ProtectedRoute>} />
-            <Route path="/pricing" element={<Pricing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -106,6 +113,8 @@ const App = () => {
   // The WebView in the Android build has no server to rewrite deep paths, so the
   // app uses hash routes. The website keeps clean URLs.
   const Router = isNativeApp ? HashRouter : BrowserRouter;
+  // VITE_MOBILE_PREVIEW lets us open the native shell in a browser at phone size.
+  const showMobileShell = isNativeApp || import.meta.env.VITE_MOBILE_PREVIEW === "true";
 
   return (
   <QueryClientProvider client={queryClient}>
@@ -116,8 +125,14 @@ const App = () => {
           <Toaster />
           <Sonner />
           <Router>
-            <HabitCoach />
-            <AnimatedRoutes />
+            {showMobileShell ? (
+              <MobileApp />
+            ) : (
+              <>
+                <HabitCoach />
+                <AnimatedRoutes />
+              </>
+            )}
           </Router>
         </HabitProvider>
       </AuthProvider>

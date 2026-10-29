@@ -20,13 +20,6 @@ const sections: LegalSection[] = [
     ],
   },
   {
-    id: "payments-security",
-    heading: "Payments Security",
-    paragraphs: [
-      "Payments are processed by Razorpay, a PCI-DSS compliant payment processor. Your card, UPI, and bank details go directly to Razorpay — they never touch our servers, and we never store them. We only receive a signed confirmation of payment, which we verify cryptographically before activating Premium.",
-    ],
-  },
-  {
     id: "data-protection",
     heading: "Data Protection Practices",
     bullets: [
@@ -54,7 +47,7 @@ const sections: LegalSection[] = [
 const Security = () => (
   <LegalPage
     title="Security"
-    subtitle="How we protect your account, your data, and your payments."
+    subtitle="How we protect your account, your habits, and your notes."
     icon={ShieldCheck}
     lastUpdated="September 27, 2026"
     sections={sections}

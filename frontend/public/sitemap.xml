@@ -2,18 +2,85 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://habbiters.app/</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://habbiters.app/pricing</loc>
+    <loc>https://habbiters.app/templates</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/blog</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://habbiters.app/login</loc>
-    <priority>0.4</priority>
+    <loc>https://habbiters.app/blog/why-habbiters-is-free</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/blog/science-of-streaks</loc>
+    <lastmod>2026-09-14</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/blog/habit-stacking-guide</loc>
+    <lastmod>2026-08-27</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/blog/why-gamification-works</loc>
+    <lastmod>2026-08-05</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/blog/30-day-reset</loc>
+    <lastmod>2026-07-18</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/about</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/careers</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/contact</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://habbiters.app/signup</loc>
+    <lastmod>2026-10-29</lastmod>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/privacy</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/terms</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/security</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://habbiters.app/delete-account</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.3</priority>
   </url>
 </urlset>

@@ -55,7 +55,7 @@ const DeleteAccount = () => {
               "All habits, streaks, check-ins, and progress history",
               "Templates, learning plans, and notes you created",
               "XP, levels, achievements, and game claims",
-              "Subscription and payment records tied to your account",
+              "Planner tasks, time entries, and calendar notes",
               "Any pending verification codes and contact messages sent with your email",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5">

@@ -8,7 +8,7 @@ import { api, getApiErrorMessage } from "@/lib/api";
 
 const topics = [
   { value: "general", label: "General question", icon: MessageSquare },
-  { value: "billing", label: "Billing & premium", icon: CreditCard },
+  { value: "billing", label: "Account & data", icon: CreditCard },
   { value: "bug", label: "Report a bug", icon: Bug },
   { value: "feature", label: "Feature request", icon: Lightbulb },
   { value: "press", label: "Press & partnerships", icon: Newspaper },
@@ -160,7 +160,7 @@ const Contact = () => {
                 <Mail className="w-5 h-5 text-primary-foreground" />
               </div>
               <h3 className="font-display font-semibold text-foreground mb-1">Email us directly</h3>
-              <p className="text-sm text-muted-foreground mb-3">Fastest for anything account or billing related.</p>
+              <p className="text-sm text-muted-foreground mb-3">Fastest for anything account or data related.</p>
               <a href={`mailto:${contactEmail}`} className="text-sm font-medium text-primary hover:underline">{contactEmail}</a>
             </motion.div>
 
@@ -169,7 +169,7 @@ const Contact = () => {
               <ul className="space-y-3">
                 {[
                   { q: "Forgot your password?", a: "Use the reset link on the login page — it takes 30 seconds." },
-                  { q: "Want to cancel premium?", a: "Open Pricing and choose “Cancel subscription at period end”. It stays active until the period ends." },
+                  { q: "Want to delete your data?", a: "Use the Delete account page to remove your profile, habits, tasks and notes permanently." },
                   { q: "Reporting a bug?", a: "Include your browser, device, and what you clicked. Screenshots help!" },
                 ].map((item) => (
                   <li key={item.q} className="text-sm">

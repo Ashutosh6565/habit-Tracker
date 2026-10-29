@@ -8,7 +8,7 @@ const values = [
   { icon: Zap, title: "Progress you can feel", desc: "XP, streaks, and levels turn boring checkboxes into a game you actually want to play." },
   { icon: Shield, title: "Privacy by default", desc: "Your data belongs to you. Encrypted, never sold, and deletable any time. No dark patterns, ever." },
   { icon: Users, title: "Built with users", desc: "Our roadmap is driven by community feedback. Found a bug or have an idea? We genuinely read every message." },
-  { icon: Globe, title: "Accessible to everyone", desc: "A generous free plan and pricing in rupees, because self-improvement shouldn't be a luxury." },
+  { icon: Globe, title: "Free for everyone", desc: "Every habit, template and tool is included at no cost — because self-improvement shouldn't be a luxury." },
   { icon: Heart, title: "Sustainable habits", desc: "We discourage all-or-nothing thinking. Miss a day? No guilt trips — just a gentle nudge to continue." },
 ];
 
@@ -22,7 +22,7 @@ const stats = [
 const milestones = [
   { year: "2024", title: "The first checkbox", desc: "Habbiters started as a weekend project — a simple tracker built to fix one person's inconsistent mornings." },
   { year: "2025", title: "Gamification era", desc: "XP, levels, and achievements launched. Engagement tripled overnight, and we knew we were onto something." },
-  { year: "2026", title: "Going global", desc: "Launched templates, learning plans, and rupee pricing to serve users everywhere. 10,000 habit-builders joined." },
+  { year: "2026", title: "Free for everyone", desc: "Made every template and feature free, and launched native mobile screens. 10,000 habit-builders joined." },
 ];
 
 const About = () => (

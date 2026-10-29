@@ -4,15 +4,12 @@ import { TemplateCatalog, type ITemplateCatalog, type TemplateUnlockTier } from 
 import { TemplateProgress } from "../models/TemplateProgress";
 import { getAccessTier, type SubscriptionTier } from "./subscription.service";
 
-const TIER_RANK: Record<TemplateUnlockTier, number> = { free: 0, starter: 1, premium: 2 };
-
 const formatCatalogTemplate = (
   row: ITemplateCatalog | null,
-  accessTier: SubscriptionTier = "free",
-  isAdmin = false
+  _accessTier: SubscriptionTier = "free",
+  _isAdmin = false
 ) => {
   if (!row) return null;
-  const hasAccess = isAdmin || TIER_RANK[row.unlockTier] <= TIER_RANK[accessTier];
   return {
     id: row.id,
     templateId: row.templateId,
@@ -27,8 +24,9 @@ const formatCatalogTemplate = (
     unlockTier: row.unlockTier,
     isActive: row.isActive,
     sortOrder: row.sortOrder,
-    locked: !hasAccess,
-    canUse: hasAccess,
+    // Every template is free now; the fields stay for older clients.
+    locked: false,
+    canUse: true,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -63,15 +61,9 @@ export const templateService = {
     };
   },
 
-  async canUseTemplate(userId: string, templateId: string, isAdmin = false) {
-    if (isAdmin) return true;
-    const [row, accessTier] = await Promise.all([
-      TemplateCatalog.findOne({ templateId, isActive: true }),
-      getAccessTierForUser(userId),
-    ]);
-    // Unknown templates are legacy progress rows; keep them usable.
-    if (!row) return true;
-    return TIER_RANK[row.unlockTier] <= TIER_RANK[accessTier];
+  async canUseTemplate(_userId: string, _templateId: string, _isAdmin = false) {
+    // Premium was removed: every catalog template is available to everyone.
+    return true;
   },
 
   async createCatalogTemplate(

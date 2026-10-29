@@ -26,7 +26,7 @@ const features = [
   { icon: Trophy, title: "Gamified progress", desc: "Earn XP for real reps, level up, and unlock achievements worth showing off." },
   { icon: BarChart3, title: "Honest analytics", desc: "See consistency, weekly trends, and where the compound effect is working." },
   { icon: Calendar, title: "Timetable view", desc: "Plan the day like an athlete: training, deep work, recovery, and sleep." },
-  { icon: Zap, title: "Template library", desc: "105 gym, study, and life templates — 12 free to start, no blank page." },
+  { icon: Zap, title: "Template library", desc: "105 gym, study, and life templates — every one free, no blank page." },
   { icon: Star, title: "Guided coaching", desc: "A habit coach that nudges you before a missed day becomes a missed week." },
 ];
 
@@ -34,47 +34,6 @@ const templates = [
   { name: "Gym & strength", habits: ["Push day", "Progressive overload", "10k steps"], color: "gradient-primary" },
   { name: "Study & focus", habits: ["Deep work 90m", "Revise notes", "Practice sets"], color: "gradient-xp" },
   { name: "Daily discipline", habits: ["6 AM wake-up", "Read 10 pages", "Plan tomorrow"], color: "gradient-streak" },
-];
-
-const plans: {
-  name: string;
-  price: string;
-  period?: string;
-  description: string;
-  features: string[];
-  cta: string;
-  ctaTo: string;
-  highlighted: boolean;
-}[] = [
-  {
-    name: "Free",
-    price: "₹0",
-    description: "Start building momentum today.",
-    features: ["Track up to 5 habits", "12 free templates", "Basic analytics", "7-day Premium trial"],
-    cta: "Start Free",
-    ctaTo: "/signup",
-    highlighted: false,
-  },
-  {
-    name: "Starter",
-    price: "₹99",
-    period: "/month",
-    description: "More structure for your routine.",
-    features: ["Everything in Free", "25 starter templates", "Save template progress", "Email support"],
-    cta: "Choose Starter",
-    ctaTo: "/pricing",
-    highlighted: false,
-  },
-  {
-    name: "Premium All",
-    price: "₹349",
-    period: "/month",
-    description: "All the tools for lasting change.",
-    features: ["Everything in Starter", "Unlimited habits", "Every current and future template", "Advanced analytics and reports"],
-    cta: "Go Premium",
-    ctaTo: "/pricing",
-    highlighted: true,
-  },
 ];
 
 const easeOutExpo: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -137,13 +96,13 @@ const Home = () => {
               </a>
             </div>
 
-            <p className="mt-4 text-xs text-muted-foreground">No card required · 7-day Premium trial · Cancel anytime</p>
+            <p className="mt-4 text-xs text-muted-foreground">Free forever · No card required · Every template included</p>
 
             <div className="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-border/70 pt-6">
               {[
                 { value: 105, suffix: "", label: "ready templates" },
-                { value: 12, suffix: "", label: "free to start" },
-                { value: 7, suffix: "d", label: "premium trial" },
+                { value: 105, suffix: "", label: "free templates" },
+                { value: 0, suffix: "₹", label: "cost to start" },
               ].map((stat) => (
                 <div key={stat.label}>
                   <CountUp to={stat.value} suffix={stat.suffix} className="font-display text-2xl font-bold text-foreground sm:text-3xl" />
@@ -208,7 +167,7 @@ const Home = () => {
               </span>
               <h2 className="mt-5 font-display text-3xl font-bold text-foreground sm:text-4xl">Steal a routine that works</h2>
               <p className="mt-3 max-w-xl text-muted-foreground">
-                Pick a template and start tracking in seconds. 12 free, 25 starter, the rest premium.
+                Pick a template and start tracking in seconds. All 105 are free, forever.
               </p>
             </div>
             <Link to="/templates" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
@@ -247,67 +206,27 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="relative border-y border-border/60 bg-card/40 py-20 backdrop-blur-sm sm:py-24">
-        <div className="container mx-auto max-w-6xl px-4">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+      {/* Free promise */}
+      <section id="free" className="relative border-y border-border/60 bg-card/40 py-16 backdrop-blur-sm">
+        <div className="container mx-auto max-w-4xl px-4 text-center">
+          <motion.div {...fadeUp}>
             <span className="sticker-chip border-primary/30 bg-primary/10 text-primary">
-              <Target className="h-3.5 w-3.5" /> Simple pricing
+              <Sparkles className="h-3.5 w-3.5" /> Everything included
             </span>
             <h2 className="mt-5 font-display text-3xl font-bold text-foreground text-balance sm:text-4xl">
-              Plans that grow with your streaks
+              All of Habbiters is free
             </h2>
             <p className="mt-4 text-muted-foreground text-balance">
-              Start free with a 7-day Premium trial, then choose the level of support that fits your goals.
+              Unlimited habits, all 105 templates, planner, time tracking, analytics and exports. No subscriptions, no
+              paywalls, no trial that expires.
             </p>
+            <Link
+              to="/signup"
+              className="mt-7 inline-flex items-center gap-2 rounded-xl gradient-primary px-7 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:opacity-95"
+            >
+              Create your free account <ArrowRight className="h-4 w-4" />
+            </Link>
           </motion.div>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => (
-              <motion.div
-                key={plan.name}
-                {...fadeUp}
-                className={`card-lift relative rounded-2xl border p-7 ${
-                  plan.highlighted
-                    ? "border-primary/40 bg-card shadow-xl shadow-primary/10"
-                    : "border-border/70 bg-card/70 backdrop-blur-sm"
-                }`}
-              >
-                {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full gradient-primary px-4 py-1 text-[11px] font-semibold text-primary-foreground">
-                    Most popular
-                  </div>
-                )}
-                <h3 className="font-display text-xl font-bold text-foreground">{plan.name}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{plan.description}</p>
-                <div className="mt-5">
-                  <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
-                  {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
-                </div>
-                <ul className="mt-6 space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={3} />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to={plan.ctaTo}
-                  className={`mt-7 block rounded-xl px-6 py-3 text-center font-semibold transition-all ${
-                    plan.highlighted
-                      ? "gradient-primary text-primary-foreground hover:opacity-90"
-                      : "border border-border text-foreground hover:bg-secondary"
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Secure payments in INR through Razorpay. Manage or cancel from the pricing page.
-          </p>
         </div>
       </section>
 

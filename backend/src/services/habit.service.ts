@@ -3,11 +3,7 @@ import slugify from "slugify";
 import { FilterQuery } from "mongoose";
 import { Habit, type HabitDifficulty, type IHabit } from "../models/Habit";
 import { HabitProgress } from "../models/HabitProgress";
-import { Subscription } from "../models/Subscription";
 import { AppError } from "../utils/AppError";
-import { User } from "../models/User";
-import { permissionService } from "./permission.service";
-import { isSubscriptionPremium } from "./subscription.service";
 import { xpService } from "./xp.service";
 import { XP_PER_LEVEL, levelFromXp, xpIntoLevel } from "../utils/xp";
 
@@ -102,14 +98,6 @@ export const habitService = {
     xp?: number;
     reminderTime?: string;
   }) {
-    const user = await User.findById(userId);
-    if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    const subscription = await Subscription.findOne({ user: userId });
-    const habitCount = await Habit.countDocuments({ user: userId, isArchived: false });
-    if (!isSubscriptionPremium(subscription) && !permissionService.has(user, subscription, "habits.unlimited") && habitCount >= 5) {
-      throw new AppError("Free plan supports up to 5 habits. Upgrade to premium for unlimited habits.", 402, "PLAN_LIMIT");
-    }
-
     const habit = await Habit.create({
       user: userId,
       title: input.title,
@@ -162,6 +150,44 @@ export const habitService = {
     );
 
     return formatHabit(habit, date);
+  },
+
+  async history(userId: string, days = 30) {
+    const habits = await Habit.find({ user: userId, isArchived: false }).sort({ createdAt: 1 });
+    const dayList: string[] = [];
+    for (let i = days - 1; i >= 0; i -= 1) {
+      dayList.push(format(subDays(new Date(), i), "yyyy-MM-dd"));
+    }
+
+    const rows = await HabitProgress.find({
+      user: userId,
+      date: { $gte: dayList[0] },
+      completed: true,
+    }).select("habit date");
+
+    const byHabit = new Map<string, string[]>();
+    const byDate = new Map<string, number>();
+    for (const row of rows) {
+      const key = String(row.habit);
+      byHabit.set(key, [...(byHabit.get(key) || []), row.date]);
+      byDate.set(row.date, (byDate.get(row.date) || 0) + 1);
+    }
+
+    return {
+      days: dayList,
+      habits: habits.map((habit) => ({
+        id: habit.id,
+        title: habit.title,
+        icon: habit.icon,
+        category: habit.category,
+        dates: byHabit.get(habit.id) || [],
+      })),
+      daily: dayList.map((date) => ({
+        date,
+        completed: byDate.get(date) || 0,
+        total: habits.length,
+      })),
+    };
   },
 
   async summary(userId: string) {

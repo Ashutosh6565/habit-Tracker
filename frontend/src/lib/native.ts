@@ -4,6 +4,7 @@ import { Browser } from "@capacitor/browser";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { StatusBar, Style } from "@capacitor/status-bar";
+import { runAndroidBackHandler } from "./backButton";
 
 export const isNativeApp = Capacitor.isNativePlatform();
 
@@ -15,7 +16,6 @@ const ROOT_ROUTES = new Set([
   "/templates",
   "/analytics",
   "/gamification",
-  "/pricing",
   "/login",
   "/signup",
 ]);
@@ -63,6 +63,7 @@ export const initNativeShell = () => {
   });
 
   CapacitorApp.addListener("backButton", ({ canGoBack }) => {
+    if (runAndroidBackHandler()) return;
     if (!ROOT_ROUTES.has(currentRoute()) && canGoBack) {
       window.history.back();
       return;

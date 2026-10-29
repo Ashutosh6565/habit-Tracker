@@ -13,7 +13,6 @@ const navLinks = [
   { label: "Templates", path: "/templates" },
   { label: "Analytics", path: "/analytics" },
   { label: "Gamification", path: "/gamification" },
-  { label: "Pricing", path: "/pricing" },
 ];
 
 const Navbar = () => {
@@ -29,9 +28,8 @@ const Navbar = () => {
     "/templates": "templates.view",
     "/analytics": "analytics.view",
     "/gamification": "gamification.view",
-    "/pricing": "pricing.view",
   };
-  const guestLinks = new Set(["/", "/templates", "/pricing"]);
+  const guestLinks = new Set(["/", "/templates"]);
   const visibleNavLinks = navLinks.filter((link) => {
     if (!user && !guestLinks.has(link.path)) return false;
     const permission = routePermission[link.path];

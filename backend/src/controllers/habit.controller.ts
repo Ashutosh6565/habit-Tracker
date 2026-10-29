@@ -48,6 +48,12 @@ export const habitController = {
     res.json({ success: true, data: await habitService.summary(req.user.id) });
   }),
 
+  history: asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) throw new AppError("Authentication required", 401, "UNAUTHENTICATED");
+    const days = Number(req.query.days) || 30;
+    res.json({ success: true, data: await habitService.history(req.user.id, days) });
+  }),
+
   youtubeMetadata: asyncHandler(async (req: Request, res: Response) => {
     res.json({ success: true, data: await youtubeService.getMetadata(String(req.query.url)) });
   }),

@@ -180,7 +180,7 @@ const Profile = () => {
               <div className="flex-1">
                 <h2 className="font-display font-bold text-foreground">Delete account</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Permanently remove your account, habits, XP, and subscription records. This cannot be undone.
+                  Permanently remove your account, habits, XP, planner tasks, time entries and notes. This cannot be undone.
                 </p>
 
                 {!deleteOpen ? (

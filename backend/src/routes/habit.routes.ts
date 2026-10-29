@@ -10,12 +10,14 @@ import {
   updateHabitSchema,
 } from "../validators/habit.validator";
 import { youtubeMetadataQuerySchema } from "../validators/youtube.validator";
+import { habitHistoryQuerySchema } from "../validators/planner.validator";
 
 export const habitRouter = Router();
 
 habitRouter.use(authenticate);
 habitRouter.use(requirePermission("tracker.view"));
 habitRouter.get("/summary", habitController.summary);
+habitRouter.get("/history", validate({ query: habitHistoryQuerySchema }), habitController.history);
 habitRouter.get("/youtube-metadata", validate({ query: youtubeMetadataQuerySchema }), habitController.youtubeMetadata);
 habitRouter.get("/", validate({ query: listHabitQuerySchema }), habitController.list);
 habitRouter.post("/", validate({ body: createHabitSchema }), habitController.create);

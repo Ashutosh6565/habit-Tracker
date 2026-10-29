@@ -38,4 +38,13 @@ export const seedTemplateCatalog = async () => {
   if (result.upsertedCount > 0) {
     logger.info(`Seeded ${result.upsertedCount} template catalog entries`);
   }
+
+  // Premium was removed: unlock any catalog rows that were created earlier.
+  const unlocked = await TemplateCatalog.updateMany(
+    { unlockTier: { $ne: "free" } },
+    { $set: { unlockTier: "free" } }
+  );
+  if (unlocked.modifiedCount > 0) {
+    logger.info(`Unlocked ${unlocked.modifiedCount} previously premium templates`);
+  }
 };

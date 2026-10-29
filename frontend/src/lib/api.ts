@@ -243,6 +243,46 @@ export interface AnalyticsOverviewDto {
   templates: { templateId: string; templateName: string; totalDays: number; habits: number }[];
 }
 
+export interface HabitHistoryDto {
+  days: string[];
+  habits: { id: string; title: string; icon: string; category: string; dates: string[] }[];
+  daily: { date: string; completed: number; total: number }[];
+}
+
+export interface PlannerTaskDto {
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  time: string;
+  completed: boolean;
+  createdAt: string;
+}
+
+export interface PlannerNoteDto {
+  id: string;
+  text: string;
+  date: string;
+  time: string;
+  createdAt: string;
+}
+
+export interface PlannerTimeEntryDto {
+  id: string;
+  habitId: string | null;
+  label: string;
+  date: string;
+  slot: number;
+  hours: number;
+}
+
+export interface PlannerTimeDto {
+  entries: PlannerTimeEntryDto[];
+  totalHours: number;
+  from: string;
+  to: string;
+}
+
 export interface AdminUserRowDto {
   id: string;
   email: string | null;
@@ -562,6 +602,9 @@ export const api = {
     summary() {
       return request<{ habits: ApiHabit[]; stats: Record<string, number> }>("/habits/summary");
     },
+    history(days = 30) {
+      return request<HabitHistoryDto>(`/habits/history?days=${days}`);
+    },
     youtubeMetadata(url: string) {
       return request<YouTubeMetadataDto>(`/habits/youtube-metadata?url=${encodeURIComponent(url)}`);
     },
@@ -689,6 +732,66 @@ export const api = {
     },
     remove(id: string) {
       return request<void>(`/contact/${id}`, { method: "DELETE" });
+    },
+  },
+  planner: {
+    tasks(query?: { date?: string; from?: string; to?: string }) {
+      const params = new URLSearchParams();
+      if (query?.date) params.set("date", query.date);
+      if (query?.from) params.set("from", query.from);
+      if (query?.to) params.set("to", query.to);
+      const qs = params.toString();
+      return request<{ tasks: PlannerTaskDto[] }>(`/planner/tasks${qs ? `?${qs}` : ""}`);
+    },
+    createTask(input: { title: string; category?: string; date?: string; time?: string }) {
+      return request<{ task: PlannerTaskDto }>("/planner/tasks", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+    },
+    updateTask(id: string, input: Partial<Pick<PlannerTaskDto, "title" | "category" | "date" | "time" | "completed">>) {
+      return request<{ task: PlannerTaskDto }>(`/planner/tasks/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      });
+    },
+    removeTask(id: string) {
+      return request<void>(`/planner/tasks/${id}`, { method: "DELETE" });
+    },
+    notes(query?: { from?: string; to?: string }) {
+      const params = new URLSearchParams();
+      if (query?.from) params.set("from", query.from);
+      if (query?.to) params.set("to", query.to);
+      const qs = params.toString();
+      return request<{ notes: PlannerNoteDto[] }>(`/planner/notes${qs ? `?${qs}` : ""}`);
+    },
+    createNote(input: { text: string; date?: string; time?: string }) {
+      return request<{ note: PlannerNoteDto }>("/planner/notes", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+    },
+    updateNote(id: string, input: Partial<Pick<PlannerNoteDto, "text" | "date" | "time">>) {
+      return request<{ note: PlannerNoteDto }>(`/planner/notes/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      });
+    },
+    removeNote(id: string) {
+      return request<void>(`/planner/notes/${id}`, { method: "DELETE" });
+    },
+    time(from?: string, to?: string) {
+      const params = new URLSearchParams();
+      if (from) params.set("from", from);
+      if (to) params.set("to", to);
+      const qs = params.toString();
+      return request<PlannerTimeDto>(`/planner/time${qs ? `?${qs}` : ""}`);
+    },
+    setTimeCell(input: { habitId?: string; label?: string; date: string; slot: number; hours: number }) {
+      return request<{ entry: PlannerTimeEntryDto | null }>("/planner/time", {
+        method: "PUT",
+        body: JSON.stringify(input),
+      });
     },
   },
   analytics: {

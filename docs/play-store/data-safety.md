@@ -40,9 +40,8 @@ For every row: **Collected = Yes**, **Shared = No**, **Processed ephemerally = N
 Select **No** for every data type. The app does not sell data and does not send personal
 data to advertising or analytics networks.
 
-Processors that host the data (Render, MongoDB Atlas, Brevo for email, Razorpay for
-payments) are service providers, not data "sharing" in Play's definition — they act only on
-your instructions.
+Processors that host the data (Render, MongoDB Atlas, Brevo for email) are service
+providers, not data "sharing" in Play's definition — they act only on your instructions.
 
 ## Section 3 — Security practices
 
@@ -65,8 +64,7 @@ The app has **no** camera, location, contacts, SMS, microphone, or storage permi
 ## Ads and payments
 
 - Contains ads: **No**
-- In-app purchases: **No** (the Android build does not sell digital goods; plans are
-  visible for information only)
+- In-app purchases: **No** (the app is completely free and sells no digital goods)
 - App is free: **Yes**
 
 ## Content rating questionnaire — quick answers

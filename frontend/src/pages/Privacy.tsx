@@ -12,8 +12,8 @@ const sections: LegalSection[] = [
     bullets: [
       "Account data — your name, email address, and a securely hashed password when you sign up.",
       "Habit data — the habits you create, completions, streaks, XP, and learning plans you build while signed in.",
+      "Planner data — tasks, notes and logged focus time you add to your planner.",
       "Usage data — basic analytics like pages visited and features used, collected anonymously to improve the product.",
-      "Payment data — handled entirely by Razorpay. We receive a confirmation that you paid, never your card or bank details.",
     ],
   },
   {
@@ -21,9 +21,8 @@ const sections: LegalSection[] = [
     heading: "How We Use Your Information",
     paragraphs: ["We use your data for exactly one purpose: making the product work for you."],
     bullets: [
-      "Sync your habits and progress across devices and browsers.",
-      "Track your subscription status (Free or Premium).",
-      "Send account-related emails such as password resets and payment confirmations.",
+      "Sync your habits, planner, notes and progress across devices and browsers.",
+      "Send account-related emails such as sign-in codes and password resets.",
       "Improve the product using anonymized, aggregate usage statistics.",
     ],
   },

@@ -1,12 +1,12 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Check, X, ArrowLeft, Dumbbell, BookOpen, Briefcase, Heart, Moon, Droplets, Brain, Palette, Code, Leaf, Pencil, Trash2, Plus, Save, Music, Camera, Utensils, GraduationCap, Languages, Mic, Headphones, PenTool, Laptop, Smartphone, Users, Baby, Dog, Mountain, Bike, Trophy, Clock, Shield, Eye, Zap, Flame, Target, Star, Coffee, Lightbulb, Globe, Building, Wallet, HandMetal, Sparkles, Search, Crown, Lock, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, X, ArrowLeft, Dumbbell, BookOpen, Briefcase, Heart, Moon, Droplets, Brain, Palette, Code, Leaf, Pencil, Trash2, Plus, Save, Music, Camera, Utensils, GraduationCap, Languages, Mic, Headphones, PenTool, Laptop, Smartphone, Users, Baby, Dog, Mountain, Bike, Trophy, Clock, Shield, Eye, Zap, Flame, Target, Star, Coffee, Lightbulb, Globe, Building, Wallet, HandMetal, Sparkles, Search, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
 import { useHabitContext } from "@/context/HabitContext";
 import { useAuth } from "@/context/AuthContext";
-import { api, type TemplateCatalogDto, type TemplateUnlockTier } from "@/lib/api";
+import { api, type TemplateCatalogDto } from "@/lib/api";
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -21,12 +21,6 @@ const TEMPLATE_ICONS: Record<string, typeof Dumbbell> = {
 };
 
 const getTemplateIcon = (name: string) => TEMPLATE_ICONS[name] || Sparkles;
-
-const TIER_LABEL: Record<TemplateUnlockTier, string> = {
-  free: "Free",
-  starter: "Starter",
-  premium: "Premium",
-};
 
 type TemplateOption = TemplateCatalogDto & { iconComponent: typeof Dumbbell };
 
@@ -174,10 +168,6 @@ const Templates = () => {
   };
 
   const openTemplate = (t: TemplateOption) => {
-    if (t.locked) {
-      navigate("/pricing");
-      return;
-    }
     setSelectedId(t.templateId);
     if (!customHabits[t.templateId]) {
       setCustomHabits((prev) => ({ ...prev, [t.templateId]: [...t.habits] }));
@@ -359,7 +349,6 @@ const Templates = () => {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {visibleTemplates.map((t, i) => {
-                const accessible = !t.locked;
                 return (
                 <motion.div
                   key={t.templateId}
@@ -367,18 +356,8 @@ const Templates = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(i, 6) * 0.04 }}
                   onClick={() => openTemplate(t)}
-                  className={`rounded-2xl border border-border bg-card overflow-hidden transition-all group relative ${
-                    accessible ? "cursor-pointer hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5" : "opacity-70 cursor-not-allowed"
-                  }`}
+                  className="rounded-2xl border border-border bg-card overflow-hidden transition-all group relative cursor-pointer hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
                 >
-                  {!accessible && (
-                    <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center rounded-2xl">
-                      <Lock className="w-6 h-6 text-muted-foreground mb-2" />
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {t.unlockTier === "starter" ? "Starter plan required" : "Premium plan required"}
-                      </span>
-                    </div>
-                  )}
                   <div className={`h-2 ${t.color}`} />
                   <div className="p-5">
                     <div className="flex items-center gap-3 mb-3">
@@ -388,14 +367,8 @@ const Templates = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-display font-bold text-foreground">{t.name}</h3>
-                          <span className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded-full font-semibold ${
-                            t.unlockTier === "free"
-                              ? "bg-secondary text-muted-foreground"
-                              : t.unlockTier === "starter"
-                              ? "bg-primary/10 text-primary"
-                              : "bg-accent text-accent-foreground"
-                          }`}>
-                            {TIER_LABEL[t.unlockTier]}
+                          <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
+                            Free
                           </span>
                         </div>
                         <span className="text-xs text-muted-foreground">{t.habits.length} habits</span>

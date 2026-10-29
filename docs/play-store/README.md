@@ -13,7 +13,7 @@ Nothing here is code — it is the paperwork Play asks for, already written.
 
 ## 1. What is already done
 
-- The Android app exists in `mobile/` and shares its screens with the website in `frontend/`.
+- The Android app exists in `mobile/` and wraps the native-style mobile screens in `frontend/src/mobile/` — it is not the website pasted into a WebView.
 - App ID: `com.habbiters.app` (permanent — it can never change after the first upload).
 - Version: `1.0.0` (code `1`).
 - Target Android API 36, minimum Android 7.0 (API 24).
@@ -30,8 +30,9 @@ Nothing here is code — it is the paperwork Play asks for, already written.
 2. Tap the file and allow "Install unknown apps" when Android asks.
 3. Open **Habbiters**. You should see the splash screen, then the home page.
 
-The debug build currently points at `https://habbiters-api.onrender.com/api/v1`.
-That server does not exist until you do step 3, so sign-up and data will fail until then.
+The debug build points at `https://habbiters-api.onrender.com/api/v1`, which is already
+deployed. If that service is asleep, the first request can take ~50 seconds — try signing
+up once, wait, and try again.
 
 ## 3. Put the API online on Render (free)
 
@@ -84,7 +85,7 @@ cd mobile/android && ./gradlew.bat bundleRelease
 4. Upload graphics:
    - App icon: use `mobile/assets/icon-only.png` (512×512 version is generated automatically by Play — upload the 1024×1024 source).
    - Feature graphic: 1024×500 (make a simple green banner with the flame + "Habbiters").
-   - Phone screenshots: at least 2, taken from the app on a phone (Home, Tracker, Gamification, Pricing).
+   - Phone screenshots: at least 2, taken from the app on a phone (Today, Time, Analytics, Tasks, Calendar).
 5. **Privacy policy URL:** `https://habbiters.app/privacy`
    (or `https://habbiters-web.onrender.com/privacy` until the domain is connected).
 6. **Account deletion URL:** `https://habbiters.app/delete-account`
@@ -132,9 +133,8 @@ cd mobile/android && ./gradlew.bat bundleRelease
 - **Avatars on disk:** uploaded profile pictures are stored on the server's local disk.
   On Render's free plan that disk is wiped on every deploy/restart, so avatars must be
   re-uploaded. Moving avatars to MongoDB GridFS or an object store fixes this.
-- **Payments:** Razorpay checkout is intentionally disabled inside the Android app.
-  Google requires Play Billing for digital subscriptions, so the app shows plans but does
-  not sell them. Buying on the website still upgrades the same account.
+- **Pricing:** the app is completely free. There is no premium tier, trial, subscription or
+  in-app purchase, so there is nothing for Play Billing to process.
 - **Push notifications:** the app uses email reminders, not push notifications. Adding
   Firebase Cloud Messaging is a separate step.
 

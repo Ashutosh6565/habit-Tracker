@@ -20,7 +20,6 @@ const Footer = () => (
             links: [
               { label: "Features", path: "/" },
               { label: "Templates", path: "/templates" },
-              { label: "Pricing", path: "/pricing" },
               { label: "Analytics", path: "/analytics" },
             ],
           },

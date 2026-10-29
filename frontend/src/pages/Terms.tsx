@@ -21,24 +21,10 @@ const sections: LegalSection[] = [
     ],
   },
   {
-    id: "subscriptions-payments",
-    heading: "Subscriptions & Payments (INR)",
+    id: "pricing",
+    heading: "Pricing",
     paragraphs: [
-      "Premium is billed in Indian Rupees (₹) through Razorpay, our payment processor. Prices are shown on the Pricing page before you pay.",
-    ],
-    bullets: [
-      "Premium is a one-time payment unless the plan page explicitly says otherwise.",
-      "Prices are inclusive of applicable taxes unless stated otherwise at checkout.",
-      "We never see or store your card, UPI, or bank details — Razorpay processes everything.",
-      "If a payment fails, your account simply stays on the Free plan; nothing is lost.",
-      "Refund requests are handled case-by-case within 7 days of purchase — email support@habbiters.app.",
-    ],
-  },
-  {
-    id: "free-plan",
-    heading: "Free Plan",
-    paragraphs: [
-      "The Free plan is free forever and includes core habit tracking. We may adjust Free plan limits from time to time, but we will never remove data you have already created without notice.",
+      "Habbiters is free to use. Every habit, planner tool, analytics view and all 105 templates are included at no cost — there are no subscriptions, in-app purchases, trials or hidden paywalls.",
     ],
   },
   {
@@ -77,7 +63,7 @@ const sections: LegalSection[] = [
     id: "limitation-of-liability",
     heading: "Limitation of Liability",
     paragraphs: [
-      "To the maximum extent permitted by law, Habbiters is not liable for indirect, incidental, or consequential damages, or for lost data caused by events beyond our reasonable control. Our total liability is limited to the amount you paid us in the 12 months before the claim, or ₹500 if you are on the Free plan.",
+      "To the maximum extent permitted by law, Habbiters is not liable for indirect, incidental, or consequential damages, or for lost data caused by events beyond our reasonable control. Our total liability is limited to ₹500.",
     ],
   },
   {

@@ -32,14 +32,11 @@ const cardVariants = {
 
 const Analytics = () => {
   const { trackerHabits, templateData, setTrackerHabits, setTemplateData } = useHabitContext();
-  const { user, subscription, isAdmin } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [exporting, setExporting] = useState<"habits" | "templates" | "daily" | null>(null);
-  const canExport = Boolean(isAdmin || subscription?.isPremium);
-  const canUseAdvanced = canExport;
 
   const downloadReport = async (type: "habits" | "templates" | "daily") => {
-    if (!canExport) return;
     setExporting(type);
     try {
       const blob = await api.analytics.exportCsv(type);
@@ -230,7 +227,7 @@ const Analytics = () => {
               <button
                 key={option.type}
                 onClick={() => downloadReport(option.type)}
-                disabled={!canExport || exporting !== null}
+                disabled={exporting !== null}
                 className="flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-xs font-semibold text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {exporting === option.type ? (
@@ -241,15 +238,6 @@ const Analytics = () => {
                 {option.label} CSV
               </button>
             ))}
-            {!canExport && (
-              <Link
-                to="/pricing"
-                className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-              >
-                <Lock className="h-3 w-3" />
-                Premium feature — upgrade to export
-              </Link>
-            )}
           </motion.div>
 
           {!hasAnyData && (
@@ -439,31 +427,7 @@ const Analytics = () => {
               )}
 
               {/* ───── TEMPLATE CHARTS ───── */}
-              {hasTemplateData && !canUseAdvanced && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-8 text-center"
-                >
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                    <Lock className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="font-display text-lg font-bold text-foreground">
-                    Advanced template analytics is Premium
-                  </h3>
-                  <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-                    Upgrade to unlock template completion trends, consistency rankings, and CSV exports of all your data.
-                  </p>
-                  <Link
-                    to="/pricing"
-                    className="mt-5 inline-flex h-10 items-center gap-2 rounded-lg gradient-primary px-4 text-sm font-semibold text-primary-foreground"
-                  >
-                    Upgrade to Premium
-                  </Link>
-                </motion.div>
-              )}
-
-              {hasTemplateData && canUseAdvanced && (
+              {hasTemplateData && (
                 <>
                   {/* Section Divider */}
                   <div className="flex items-center gap-3 pt-4">

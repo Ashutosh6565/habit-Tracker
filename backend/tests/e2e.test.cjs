@@ -125,70 +125,38 @@ test("habbiters API end-to-end", async (t) => {
     assert.ok(verified.data.data.session.accessToken);
   });
 
-  await t.test("template catalog is public and hides premium templates for free users", async () => {
+  await t.test("template catalog is public and every template is free", async () => {
     const guest = await api("/templates/catalog");
     assert.equal(guest.status, 200);
     assert.equal(guest.data.data.accessTier, "free");
 
-    // New accounts start on a 7-day premium trial. Expire it so the free-tier
-    // gating assertions below exercise the paid/free boundary.
-    const { Subscription } = require("../dist/models/Subscription.js");
-    const { User } = require("../dist/models/User.js");
-    const user = await User.findOne({ email: userEmail });
-    await Subscription.updateOne(
-      { user: user._id },
-      { $set: { status: "expired", trialEnd: new Date(Date.now() - 60_000) } }
-    );
-
     const catalog = await api("/templates/catalog", { token: userToken });
     assert.equal(catalog.status, 200);
-    const { accessTier, templates } = catalog.data.data;
-    assert.equal(accessTier, "free");
+    const { templates } = catalog.data.data;
+    assert.ok(templates.length >= 100);
+    assert.ok(templates.every((row) => row.unlockTier === "free"));
+    assert.ok(templates.every((row) => row.locked === false));
+    assert.ok(templates.every((row) => row.canUse === true));
 
-    const freeCount = templates.filter((row) => row.unlockTier === "free").length;
-    const starterCount = templates.filter((row) => row.unlockTier === "starter").length;
-    const premiumCount = templates.filter((row) => row.unlockTier === "premium").length;
-    assert.equal(freeCount, 12);
-    assert.equal(starterCount, 25);
-    assert.equal(premiumCount, 68);
-
-    const freeTemplate = templates.find((row) => row.unlockTier === "free");
-    assert.equal(freeTemplate.locked, false);
-    const starterTemplate = templates.find((row) => row.unlockTier === "starter");
-    assert.equal(starterTemplate.locked, true);
-    const premiumTemplate = templates.find((row) => row.unlockTier === "premium");
-    assert.equal(premiumTemplate.locked, true);
-    premiumTemplateId = premiumTemplate.templateId;
-    starterTemplateId = starterTemplate.templateId;
+    premiumTemplateId = templates.find((row) => row.templateId.includes("gym"))?.templateId || templates[0].templateId;
+    starterTemplateId = templates[templates.length - 1].templateId;
   });
 
-  await t.test("server rejects progress writes for locked templates", async () => {
-    const locked = await api("/templates", {
-      method: "PUT",
-      token: userToken,
-      body: {
-        templateId: premiumTemplateId,
-        templateName: "Locked",
-        habits: [{ habitId: "x1", name: "Locked habit", icon: "🔒" }],
-        completions: { x1: { 1: true } },
-        totalDays: 30,
-      },
-    });
-    assert.equal(locked.status, 403, JSON.stringify(locked.data));
-    assert.equal(locked.data.error.code, "TEMPLATE_LOCKED");
-
-    const starter = await api("/templates", {
-      method: "PUT",
-      token: userToken,
-      body: {
-        templateId: starterTemplateId,
-        templateName: "Starter",
-        habits: [{ habitId: "s1", name: "Starter habit", icon: "⭐" }],
-        completions: { s1: { 1: true } },
-        totalDays: 30,
-      },
-    });
-    assert.equal(starter.status, 403, JSON.stringify(starter.data));
+  await t.test("any template progress saves for free users", async () => {
+    for (const templateId of [premiumTemplateId, starterTemplateId]) {
+      const saved = await api("/templates", {
+        method: "PUT",
+        token: userToken,
+        body: {
+          templateId,
+          templateName: "Unlocked",
+          habits: [{ habitId: "x1", name: "Unlocked habit", icon: "🔓" }],
+          completions: { x1: { 1: true } },
+          totalDays: 30,
+        },
+      });
+      assert.equal(saved.status, 200, JSON.stringify(saved.data));
+    }
   });
 
   await t.test("free template progress saves and reloads", async () => {
@@ -356,13 +324,90 @@ test("habbiters API end-to-end", async (t) => {
     assert.ok(summary.data.data.stats.todayXP >= 10);
   });
 
-  await t.test("premium CSV export is locked for free plans", async () => {
-    const denied = await api("/analytics/export?type=habits", { token: userToken });
-    assert.equal(denied.status, 403, JSON.stringify(denied.data));
-    assert.equal(denied.data.error.code, "PERMISSION_DENIED");
+  await t.test("habit history and planner APIs persist", async () => {
+    const created = await api("/habits", {
+      method: "POST",
+      token: userToken,
+      body: { title: "Planner focus", category: "Study", icon: "📚", difficulty: "medium" },
+    });
+    assert.equal(created.status, 201, JSON.stringify(created.data));
+    const habitId = created.data.data.habit.id;
+    await api(`/habits/${habitId}/progress`, {
+      method: "POST",
+      token: userToken,
+      body: { completed: true },
+    });
+
+    const history = await api("/habits/history?days=7", { token: userToken });
+    assert.equal(history.status, 200, JSON.stringify(history.data));
+    assert.equal(history.data.data.days.length, 7);
+    const tracked = history.data.data.habits.find((row) => row.id === habitId);
+    assert.ok(tracked);
+    assert.equal(tracked.dates.length, 1);
+
+    const task = await api("/planner/tasks", {
+      method: "POST",
+      token: userToken,
+      body: { title: "Read 10 pages", category: "Study", time: "07:30" },
+    });
+    assert.equal(task.status, 201, JSON.stringify(task.data));
+    const taskId = task.data.data.task.id;
+    assert.equal(task.data.data.task.completed, false);
+
+    const patched = await api(`/planner/tasks/${taskId}`, {
+      method: "PATCH",
+      token: userToken,
+      body: { completed: true },
+    });
+    assert.equal(patched.status, 200, JSON.stringify(patched.data));
+    assert.equal(patched.data.data.task.completed, true);
+
+    const taskList = await api("/planner/tasks", { token: userToken });
+    assert.equal(taskList.status, 200);
+    assert.ok(taskList.data.data.tasks.some((row) => row.id === taskId));
+
+    const note = await api("/planner/notes", {
+      method: "POST",
+      token: userToken,
+      body: { text: "Felt sharp after the morning walk", time: "08:15" },
+    });
+    assert.equal(note.status, 201, JSON.stringify(note.data));
+    const notes = await api("/planner/notes", { token: userToken });
+    assert.equal(notes.status, 200);
+    assert.ok(notes.data.data.notes.some((row) => row.id === note.data.data.note.id));
+
+    const today = new Date().toISOString().slice(0, 10);
+    const cell = await api("/planner/time", {
+      method: "PUT",
+      token: userToken,
+      body: { habitId, label: "Deep work", date: today, slot: 9, hours: 1.5 },
+    });
+    assert.equal(cell.status, 200, JSON.stringify(cell.data));
+    assert.equal(cell.data.data.entry.hours, 1.5);
+
+    const time = await api(`/planner/time?from=${today}&to=${today}`, { token: userToken });
+    assert.equal(time.status, 200);
+    assert.equal(time.data.data.totalHours, 1.5);
+
+    const cleared = await api("/planner/time", {
+      method: "PUT",
+      token: userToken,
+      body: { habitId, date: today, slot: 9, hours: 0 },
+    });
+    assert.equal(cleared.status, 200);
+    assert.equal(cleared.data.data.entry, null);
+
+    const removed = await api(`/planner/tasks/${taskId}`, { method: "DELETE", token: userToken });
+    assert.equal(removed.status, 204);
   });
 
-  await t.test("payment claim stays pending until an admin approves it", async () => {
+  await t.test("CSV export is available on the free plan", async () => {
+    const allowed = await apiText("/analytics/export?type=habits", { token: userToken });
+    assert.equal(allowed.status, 200, allowed.text);
+    assert.match(allowed.contentType, /text\/csv/);
+  });
+
+  await t.test("payment claim can be filed and approved by an admin", async () => {
     const created = await api("/payments/claims", {
       method: "POST",
       token: userToken,
@@ -389,8 +434,8 @@ test("habbiters API end-to-end", async (t) => {
     assert.equal(mine.status, 200);
     assert.equal(mine.data.data.claims[0].status, "pending");
 
-    const stillLocked = await api("/templates/catalog", { token: userToken });
-    assert.equal(stillLocked.data.data.accessTier, "free");
+    const stillFree = await api("/templates/catalog", { token: userToken });
+    assert.ok(stillFree.data.data.templates.every((row) => row.locked === false));
 
     const adminAuth = await signup("Habit Admin", adminEmail);
     adminToken = adminAuth.session.accessToken;
@@ -417,23 +462,8 @@ test("habbiters API end-to-end", async (t) => {
     assert.equal(approved.status, 200, JSON.stringify(approved.data));
     assert.equal(approved.data.data.claim.status, "paid");
 
-    const unlocked = await api("/templates/catalog", { token: userToken });
-    assert.equal(unlocked.data.data.accessTier, "premium");
-    const premiumRow = unlocked.data.data.templates.find((row) => row.templateId === premiumTemplateId);
-    assert.equal(premiumRow.locked, false);
-
-    const nowAllowed = await api("/templates", {
-      method: "PUT",
-      token: userToken,
-      body: {
-        templateId: premiumTemplateId,
-        templateName: premiumRow.name,
-        habits: premiumRow.habits,
-        completions: { [premiumRow.habits[0].habitId]: { 1: true } },
-        totalDays: premiumRow.totalDays,
-      },
-    });
-    assert.equal(nowAllowed.status, 200, JSON.stringify(nowAllowed.data));
+    const afterApproval = await api("/templates/catalog", { token: userToken });
+    assert.ok(afterApproval.data.data.templates.every((row) => row.locked === false));
   });
 
   await t.test("premium CSV export returns habit and trend reports", async () => {
