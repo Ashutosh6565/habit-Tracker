@@ -1,0 +1,64 @@
+# ---------------------------------------------------------------------------
+# Habbiters — repository-wide ignores
+# Package-specific rules also live in backend/.gitignore and frontend/.gitignore
+# ---------------------------------------------------------------------------
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+.vite/
+
+# Environment and secrets (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime user uploads (avatars, attachments)
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/avatars/
+backend/uploads/avatars/*
+!backend/uploads/avatars/.gitkeep
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Test artifacts and coverage
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+.mongodb-binaries/
+.cache/
+
+# Local scratch space and tooling output
+.tmp/
+.tmp-shots/
+*.local
+
+# Editors and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

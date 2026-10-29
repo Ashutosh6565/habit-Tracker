@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Habbiters — Full-Stack Code Audit &amp; Remediation Plan</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #1a1c22;
+    --muted: #5b6472;
+    --line: #e2e6ec;
+    --accent: #2f6df6;
+    --crit: #b3261e;
+    --high: #c9560c;
+    --med: #a67c00;
+    --low: #4b7a3f;
+    --note: #4a5568;
+    --bg-soft: #f6f8fb;
+    --code-bg: #f4f6fa;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    margin: 0;
+    font-size: 13.5px;
+  }
+  .page {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px 46px 56px;
+  }
+  h1 { font-size: 27px; margin: 0 0 4px; letter-spacing: -0.4px; }
+  h2 {
+    font-size: 18px; margin: 34px 0 10px; padding-bottom: 6px;
+    border-bottom: 2px solid var(--ink); letter-spacing: -0.2px;
+  }
+  h3 { font-size: 14.5px; margin: 22px 0 6px; }
+  p { margin: 0 0 10px; }
+  a { color: var(--accent); text-decoration: none; }
+  small { color: var(--muted); }
+  code {
+    font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+    background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: 12px;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; overflow-x: auto; font-size: 11.8px; line-height: 1.5;
+    font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+  }
+  pre .rm { color: var(--crit); }
+  pre .add { color: var(--low); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 6px; font-size: 12.3px; }
+  th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--bg-soft); font-weight: 600; border-bottom: 1.5px solid var(--line); }
+  .tag {
+    display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px;
+    padding: 2px 7px; border-radius: 20px; color: #fff; white-space: nowrap;
+  }
+  .t-crit { background: var(--crit); }
+  .t-high { background: var(--high); }
+  .t-med  { background: var(--med); }
+  .t-low  { background: var(--low); }
+  .t-dec  { background: #5a4b9a; }
+  .t-fixed { background: #0f7b57; }
+  .cover {
+    border: 1px solid var(--line); border-left: 5px solid var(--accent);
+    border-radius: 10px; padding: 26px 28px; background: linear-gradient(180deg,#fbfcfe,#f4f7fc);
+  }
+  .cover .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 26px; margin-top: 18px; font-size: 12.5px; }
+  .meta-grid div { padding: 3px 0; border-bottom: 1px dotted var(--line); }
+  .meta-grid b { color: var(--muted); font-weight: 600; }
+  .callout {
+    border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    background: var(--bg-soft); border-radius: 8px; padding: 12px 15px; margin: 12px 0;
+  }
+  .callout.warn { border-left-color: var(--high); }
+  .callout.good { border-left-color: #0f7b57; }
+  .finding {
+    border: 1px solid var(--line); border-radius: 9px; padding: 14px 16px; margin: 12px 0;
+    break-inside: avoid;
+  }
+  .finding h3 { margin-top: 0; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .finding .loc { font-family: "SF Mono", Consolas, monospace; font-size: 11.5px; color: var(--muted); }
+  .kv { margin: 6px 0; }
+  .kv b { display: inline-block; min-width: 74px; color: var(--muted); font-weight: 600; }
+  ul, ol { margin: 6px 0 12px; padding-left: 22px; }
+  li { margin: 3px 0; }
+  .phase { border:1px solid var(--line); border-radius:9px; padding: 12px 16px; margin: 10px 0; break-inside: avoid; }
+  .phase h3 { margin-top: 0; }
+  .done { color: #0f7b57; font-weight: 700; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+  .toc a { color: var(--ink); }
+  .toc td:first-child { color: var(--muted); width: 26px; }
+  @media print {
+    .page { max-width: none; padding: 0 8mm; }
+    h2 { break-after: avoid; }
+    .no-print { display: none; }
+    a { color: var(--ink); }
+  }
+  @page { size: A4; margin: 16mm 12mm; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <h1>Habbiters — Full-Stack Code Audit &amp; Remediation Plan</h1>
+    <div class="sub">Backend (Express · TypeScript · Mongoose) &amp; Frontend (React · Vite · TypeScript)</div>
+    <div class="meta-grid">
+      <div><b>Prepared for</b> DELL</div>
+      <div><b>Date</b> 12 September 2026</div>
+      <div><b>Scope</b> Full stack, deep review</div>
+      <div><b>Repository</b> habbittracker</div>
+      <div><b>Issues catalogued</b> 1 critical · 5 high · 6 medium · 12 low</div>
+      <div><b>Status</b> Priority fix applied in this pass</div>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <b>What was already done in this pass.</b> The single most urgent <em>code</em> defect — an
+    unhandled promise rejection in the authentication middleware that made requests hang instead of
+    returning <code>401</code> — has been fixed and is described in
+    §7 (&ldquo;Changes applied&rdquo;). A runnable starter test suite was also added (§6).
+  </div>
+
+  <h2>1. Executive summary</h2>
+  <p>
+    Habbiters is a well-structured habit-tracking application with a genuinely solid security
+    foundation on the backend: ownership scoping prevents cross-user data access (no IDOR),
+    input is globally sanitised, auth routes are rate-limited, one-time passwords and refresh
+    tokens are stored hashed, passwords use bcrypt at cost 12, and the Stripe webhook verifies its
+    signature against the raw request body. Those are the hard things to get right, and they are
+    right.
+  </p>
+  <p>
+    The review nonetheless surfaced one <b>critical</b> issue, several <b>high</b>-severity issues,
+    and a broad tail of medium and low items. Two themes dominate. First, the entire
+    <b>premium / paywall / billing system has been deliberately switched off in code</b> — not via
+    configuration, but by commenting out real logic and returning hard-coded &ldquo;everyone is
+    premium&rdquo; stubs across both backend and frontend. This looks intentional (a
+    &ldquo;make everything free&rdquo; decision), but it was done in a way that leaves dead,
+    misleading code throughout the codebase and needs a clean resolution. Second, a handful of
+    <b>real defects</b> exist independent of that decision: JWTs stored in <code>localStorage</code>
+    (the critical item), an avatar-upload path that trusts client-supplied file types, an
+    N+1 query explosion in streak calculation, and two build-breaking type errors on the frontend.
+  </p>
+  <p>
+    None of the security-relevant findings require a rewrite. The recommended sequence in §5 fixes
+    the critical and high items in small, low-risk steps, starting with the auth fix that is already
+    applied.
+  </p>
+
+  <h2>2. How to read this report</h2>
+  <table class="toc">
+    <tr><td>3</td><td><a href="#sev">Severity summary</a> — every finding at a glance</td></tr>
+    <tr><td>4</td><td><a href="#paywall">The dominant theme</a> — the paywall is disabled in code</td></tr>
+    <tr><td>5</td><td><a href="#findings">Detailed findings</a> — evidence and recommended fix per issue</td></tr>
+    <tr><td>6</td><td><a href="#tests">Toolchain &amp; test results</a> — what passes, what fails, the new test suite</td></tr>
+    <tr><td>7</td><td><a href="#changes">Changes applied in this pass</a> — the auth fix, with diff</td></tr>
+    <tr><td>8</td><td><a href="#plan">Phased remediation plan</a> — the recommended order of work</td></tr>
+  </table>
+  <p><small>Severity reflects impact &times; likelihood for a production deployment. &ldquo;Decision&rdquo;
+    marks an item that is a product choice to confirm rather than a bug to fix.</small></p>
+
+  <h2 id="sev">3. Severity summary</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Severity</th><th>Area</th><th>Finding</th></tr></thead>
+    <tbody>
+      <tr><td>SEC-1</td><td><span class="tag t-crit">CRITICAL</span></td><td>Frontend</td><td>JWT access &amp; refresh tokens stored in <code>localStorage</code> (XSS &rarr; full account takeover)</td></tr>
+      <tr><td>AUTH-1</td><td><span class="tag t-fixed">HIGH · FIXED</span></td><td>Backend</td><td>Async auth middleware throws unhandled rejection on expired token &rarr; request hangs instead of 401</td></tr>
+      <tr><td>SEC-2</td><td><span class="tag t-high">HIGH</span></td><td>Backend</td><td>Avatar upload trusts client MIME type &amp; filename extension; served from static <code>/uploads</code> &rarr; stored XSS</td></tr>
+      <tr><td>PERF-1</td><td><span class="tag t-high">HIGH</span></td><td>Backend</td><td>Streak calc runs up to 365 sequential queries per habit (N+1) on list / summary / analytics</td></tr>
+      <tr><td>BUILD-1</td><td><span class="tag t-high">HIGH</span></td><td>Frontend</td><td><code>tsc</code> fails: Recharts <code>Legend</code> formatter type mismatch in <code>Analytics.tsx</code></td></tr>
+      <tr><td>BUILD-2</td><td><span class="tag t-high">HIGH</span></td><td>Frontend</td><td><code>tsc</code> fails: <code>plan.period</code> does not exist in <code>Home.tsx</code></td></tr>
+      <tr><td>DATA-1</td><td><span class="tag t-med">MEDIUM</span></td><td>Backend</td><td><code>completed</code> filter applied after pagination; <code>total</code> ignores it &rarr; wrong pages &amp; counts</td></tr>
+      <tr><td>AUTH-2</td><td><span class="tag t-med">MEDIUM</span></td><td>Frontend</td><td>Token refresh has no single-flight guard; concurrent 401s can log the user out</td></tr>
+      <tr><td>DATA-2</td><td><span class="tag t-med">MEDIUM</span></td><td>Frontend</td><td>Sign-out does not clear in-memory habit context &rarr; one user&rsquo;s data can bleed into the next session</td></tr>
+      <tr><td>UX-1</td><td><span class="tag t-med">MEDIUM</span></td><td>Frontend</td><td>Dashboard weekly chart is generated with <code>Math.random()</code> instead of real data</td></tr>
+      <tr><td>UX-2</td><td><span class="tag t-med">MEDIUM</span></td><td>Frontend</td><td>Analytics reads only in-memory context &rarr; blank after a page refresh</td></tr>
+      <tr><td>STREAK-2</td><td><span class="tag t-med">MEDIUM</span></td><td>Backend</td><td>Streak loop starts at today; an active streak shows 0 until today is completed</td></tr>
+      <tr><td>PAY-0</td><td><span class="tag t-dec">DECISION</span></td><td>Full stack</td><td>Premium / paywall / billing disabled by stubbing &amp; commented code across the whole stack</td></tr>
+      <tr><td>LOW-*</td><td><span class="tag t-low">LOW &times;12</span></td><td>Mixed</td><td>See §5.4 — dead code, unescaped email HTML, missing timeouts, un-paginated admin list, etc.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="paywall">4. The dominant theme: the paywall is disabled in code</h2>
+  <p>
+    Across both tiers of the application, the logic that would gate premium features has been
+    replaced with stubs that grant everything, and the real implementations have been left in place
+    but commented out. This is consistent enough to look like a deliberate &ldquo;make the whole app
+    free&rdquo; decision — but because it was done by editing code rather than by a feature flag, the
+    codebase now contains a large amount of dead, contradictory logic. Where it currently lives:
+  </p>
+  <table>
+    <thead><tr><th>Location</th><th>Current behaviour</th></tr></thead>
+    <tbody>
+      <tr><td><code>services/subscription.service.ts</code></td><td><code>getSubscriptionTier()</code> does <code>void subscription; return "premium"</code>; the real tier logic is commented out. <code>formatSubscription()</code> hard-codes <code>isPremium:true, status:"active", isActive:true</code>.</td></tr>
+      <tr><td><code>config/permissions.ts</code></td><td><code>habits.unlimited</code>, <code>templates.premium</code>, <code>analytics.advanced</code>, <code>reports.export</code> each have their original <code>free:false</code> commented out and replaced with <code>free:true</code>.</td></tr>
+      <tr><td><code>services/habit.service.ts</code></td><td><code>create()</code> — the free-plan 5-habit limit block is fully commented out.</td></tr>
+      <tr><td><code>controllers/payment.controller.ts</code></td><td><code>checkout</code> returns a fake <code>{ id:"free-access", url:null }</code>; <code>cancelSubscription</code> is a no-op. Real Stripe calls are commented out.</td></tr>
+      <tr><td>Frontend gates</td><td><code>PremiumGate</code> renders children unconditionally; <code>ProtectedRoute</code> only blocks when a permission is explicitly <code>false</code>; <code>Templates</code> treats every template as accessible; <code>Pricing</code> hard-codes the current tier to <code>free</code>.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <b>Decision needed before any &ldquo;fix.&rdquo;</b> If free-for-everyone is the intended product,
+    the clean path is to <em>remove</em> the dead billing/subscription/permission code (and the Stripe
+    surface) rather than leave it commented — otherwise every future reader has to reverse-engineer
+    which branch is live. If the paywall is meant to come back, it should be reinstated behind a single
+    feature flag. Either way this is a product call, so nothing in this area was changed in this pass.
+  </div>
+
+  <h2 id="findings">5. Detailed findings</h2>
+
+  <h3>5.1 Critical</h3>
+  <div class="finding">
+    <h3><span>SEC-1 &nbsp;JWTs stored in <code>localStorage</code></span><span class="tag t-crit">CRITICAL</span></h3>
+    <div class="loc">frontend/src/lib/api.ts — <code>tokenStore</code></div>
+    <div class="kv"><b>What</b> Both the access token and the long-lived refresh token are persisted with <code>localStorage.setItem</code> and read back on every request to build the <code>Authorization</code> header.</div>
+    <div class="kv"><b>Why it matters</b> <code>localStorage</code> is readable by any JavaScript running on the page. A single XSS vector — a dependency compromise, an unescaped user string, a malicious avatar (see SEC-2) — lets an attacker exfiltrate both tokens and fully impersonate the user, including refreshing sessions indefinitely. This is the highest-impact issue in the codebase.</div>
+    <div class="kv"><b>Fix</b> Move tokens to <code>httpOnly</code>, <code>Secure</code>, <code>SameSite</code> cookies set by the backend (the backend already reads <code>req.cookies?.accessToken</code>, so it is half-wired for this). The frontend then stops touching token storage entirely and relies on <code>credentials:"include"</code> (already set). If tokens must remain client-side short-term, at minimum keep only the access token in memory (not <code>localStorage</code>) and keep the refresh token in an <code>httpOnly</code> cookie.</div>
+  </div>
+
+  <h3>5.2 High</h3>
+  <div class="finding">
+    <h3><span>AUTH-1 &nbsp;Unhandled rejection in auth middleware</span><span class="tag t-fixed">FIXED IN THIS PASS</span></h3>
+    <div class="loc">backend/src/middlewares/auth.middleware.ts — <code>authenticate</code></div>
+    <div class="kv"><b>What</b> <code>authenticate</code> was <code>async</code> but registered directly (not through <code>asyncHandler</code>). <code>verifyAccessToken()</code> calls <code>jwt.verify</code>, which <em>throws</em> on an expired, malformed, or tampered token. In an async handler that throw becomes a rejected promise with no <code>.catch</code>.</div>
+    <div class="kv"><b>Why it matters</b> Access tokens expire every 15 minutes, so this fired routinely: instead of a clean <code>401</code>, the request produced an unhandled promise rejection and hung. That also broke the frontend&rsquo;s refresh-on-401 flow (it never received the 401 that triggers a refresh), and unhandled rejections can crash the Node process under strict settings.</div>
+    <div class="kv"><b>Fix applied</b> Wrapped <code>authenticate</code> (and the structurally identical <code>requirePermission</code>) with the existing <code>asyncHandler</code>, and wrapped the <code>verifyAccessToken</code> call in try/catch that maps token errors to a <code>401 INVALID_TOKEN</code> — preserving the client refresh flow. Full diff in §7.</div>
+  </div>
+  <div class="finding">
+    <h3><span>SEC-2 &nbsp;Avatar upload trusts client-supplied type</span><span class="tag t-high">HIGH</span></h3>
+    <div class="loc">backend/src/middlewares/upload.middleware.ts + app.ts static <code>/uploads</code></div>
+    <div class="kv"><b>What</b> The multer <code>fileFilter</code> checks <code>file.mimetype</code> (sent by the client and trivially spoofed) and the stored filename&rsquo;s extension comes from <code>path.extname(file.originalname)</code> (also client-controlled). Files are then served as static content from <code>/uploads</code>.</div>
+    <div class="kv"><b>Why it matters</b> An attacker can upload an <code>.html</code> or SVG payload with a declared image MIME type; when the victim opens the served URL, it executes in the app&rsquo;s origin — stored XSS, which chains directly into SEC-1 to steal tokens.</div>
+    <div class="kv"><b>Fix</b> Validate real content by sniffing magic bytes (e.g. <code>file-type</code>) rather than trusting the header; generate the stored filename and extension server-side from the detected type (never from <code>originalname</code>); serve uploads with <code>Content-Type</code> pinned and <code>Content-Disposition: attachment</code> (or from a separate cookieless domain), and add a restrictive CSP.</div>
+  </div>
+  <div class="finding">
+    <h3><span>PERF-1 &nbsp;N+1 explosion in streak calculation</span><span class="tag t-high">HIGH</span></h3>
+    <div class="loc">backend/src/services/habit.service.ts — <code>getCurrentStreak</code> / <code>formatHabit</code></div>
+    <div class="kv"><b>What</b> <code>getCurrentStreak</code> loops up to 365 times, awaiting a separate <code>HabitProgress.findOne</code> <em>each</em> iteration. <code>formatHabit</code> calls it for every habit, and <code>list()</code> / <code>summary()</code> call <code>formatHabit</code> for every habit via <code>Promise.all</code>.</div>
+    <div class="kv"><b>Why it matters</b> A user with 20 habits triggers up to ~7,300 sequential database round-trips for a single page load (~36,600 at 100 habits). This dominates latency and will fall over under any real concurrency.</div>
+    <div class="kv"><b>Fix</b> Replace the per-day loop with one range query per habit (fetch the last N days of <code>HabitProgress</code> in a single call and compute the streak in memory), or aggregate all habits&rsquo; recent progress in one <code>$in</code> / aggregation query and derive every streak from that result set.</div>
+  </div>
+  <div class="finding">
+    <h3><span>BUILD-1 / BUILD-2 &nbsp;Frontend type-check fails</span><span class="tag t-high">HIGH</span></h3>
+    <div class="loc">frontend/src/pages/Analytics.tsx (~L385) &middot; frontend/src/pages/Home.tsx (~L193)</div>
+    <div class="kv"><b>What</b> <code>tsc</code> reports two errors: a Recharts <code>Legend</code> <code>formatter</code> whose signature does not match the expected type, and a reference to <code>plan.period</code> on a type that has no <code>period</code> field.</div>
+    <div class="kv"><b>Why it matters</b> These break a strict production build (<code>tsc</code> / <code>vite build</code>). They are small but block CI and any type-safe deploy.</div>
+    <div class="kv"><b>Fix</b> Give the <code>formatter</code> the signature Recharts expects (<code>(value, entry, index) =&gt; ReactNode</code>) or cast the callback; correct the <code>plan</code> object shape (add <code>period</code> to the type or read the field that actually exists).</div>
+  </div>
+
+  <h3>5.3 Medium</h3>
+  <div class="finding">
+    <h3><span>DATA-1 &nbsp;Filter applied after pagination</span><span class="tag t-med">MEDIUM</span></h3>
+    <div class="loc">backend/src/services/habit.service.ts — <code>list()</code></div>
+    <div class="kv"><b>What</b> The DB query paginates with <code>skip/limit</code> on a filter that excludes <code>completed</code> (a derived field), and <code>total</code> = <code>countDocuments(filter)</code> also ignores it. The <code>completed</code> filter is then applied to the already-paginated page in memory.</div>
+    <div class="kv"><b>Why it matters</b> A &ldquo;show completed&rdquo; view returns only whatever happens to be on the current page, and the pagination meta (<code>total</code>, <code>totalPages</code>) is wrong whenever that filter is used.</div>
+    <div class="kv"><b>Fix</b> Push completion state into the query (join/lookup against today&rsquo;s <code>HabitProgress</code>, or precompute a per-day completion set) so filtering and counting both happen at the database before <code>skip/limit</code>.</div>
+  </div>
+  <div class="finding">
+    <h3><span>AUTH-2 &nbsp;No single-flight guard on token refresh</span><span class="tag t-med">MEDIUM</span></h3>
+    <div class="loc">frontend/src/lib/api.ts — <code>request()</code> 401 branch</div>
+    <div class="kv"><b>What</b> When several requests receive <code>401</code> at once, each independently posts to <code>/auth/refresh</code>. With refresh-token rotation, the first rotates the token and the rest present a now-stale token, fail, and call <code>tokenStore.clear()</code>.</div>
+    <div class="kv"><b>Why it matters</b> A burst of parallel calls (a dashboard loading several widgets) can spuriously log the user out.</div>
+    <div class="kv"><b>Fix</b> Share a single in-flight refresh promise: the first 401 starts the refresh, concurrent callers await the same promise, then all retry once.</div>
+  </div>
+  <div class="finding">
+    <h3><span>DATA-2 / UX-1 / UX-2 / STREAK-2 &nbsp;State &amp; correctness</span><span class="tag t-med">MEDIUM</span></h3>
+    <div class="kv"><b>DATA-2</b> Sign-out does not reset the in-memory habit context, so a subsequent login on the same tab can briefly show the previous user&rsquo;s habits. Clear all client state on logout.</div>
+    <div class="kv"><b>UX-1</b> The dashboard weekly chart is populated with <code>Math.random()</code> rather than real completion history. Wire it to the summary/analytics endpoint.</div>
+    <div class="kv"><b>UX-2</b> Analytics reads only from in-memory context, so a hard refresh shows a blank page until data is re-fetched. Fetch on mount.</div>
+    <div class="kv"><b>STREAK-2</b> The streak loop starts at <code>i=0</code> (today); if today is not yet completed it breaks immediately and reports <code>0</code>, hiding an otherwise-active streak. Start from yesterday (or treat today as optional) when computing the streak.</div>
+  </div>
+
+  <h3>5.4 Low (roll-up)</h3>
+  <p>Individually minor; worth a cleanup sweep once the above are resolved:</p>
+  <ul>
+    <li><b>Dead / contradictory code</b> from the disabled paywall (see §4) — largest single source of confusion.</li>
+    <li><code>setProgress</code> sets <code>completedAt: undefined</code> in a <code>$set</code>, which does not clear a previous <code>completedAt</code> (use <code>$unset</code>).</li>
+    <li>Notification <code>sentAt</code> is set even when the send did not actually occur.</li>
+    <li>Outbound email HTML is not escaped (header/footer injection risk in templated mail).</li>
+    <li>YouTube metadata fetch has no timeout (a slow upstream can hang the request).</li>
+    <li><code>avatarUrl</code> accepts arbitrary schemes (no <code>http(s)</code>-only restriction).</li>
+    <li>Admin user list is returned un-paginated.</li>
+    <li>Frontend <code>.env</code> is not git-ignored; secrets/URLs risk being committed.</li>
+    <li>404 page and footer use raw <code>&lt;a&gt;</code> tags instead of the router, causing full reloads.</li>
+    <li>Assorted dead code / unused exports left after the stubbing.</li>
+    <li>Fallback dev secrets in <code>env.ts</code> are convenient but should be impossible to use if <code>NODE_ENV</code> is ever misconfigured — fail fast outside development too.</li>
+    <li>Weekly/monthly stats and level thresholds are magic numbers; centralise them.</li>
+  </ul>
+
+  <div class="callout good">
+    <b>Confirmed correct — do not &ldquo;fix.&rdquo;</b> Ownership scoping (no IDOR), route auth wiring,
+    global Mongo sanitisation, rate limiting on auth routes, hashed OTP with attempt limits, hashed
+    refresh tokens, bcrypt cost 12, Stripe webhook signature verified against the raw body, cascade
+    delete of <code>HabitProgress</code>, sensible indexes/unique constraints, and request body-size caps
+    are all implemented correctly.
+  </div>
+
+  <h2 id="tests">6. Toolchain &amp; test results</h2>
+  <table>
+    <thead><tr><th>Check</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Backend <code>tsc</code> (build)</td><td>Passes</td></tr>
+      <tr><td>Backend <code>eslint</code></td><td>Passes</td></tr>
+      <tr><td>Frontend <code>tsc</code></td><td><b>Fails</b> — 2 errors (BUILD-1, BUILD-2)</td></tr>
+      <tr><td>Frontend <code>vitest</code></td><td>Not runnable in this sandbox (native <code>@rollup/*</code> / esbuild binaries are Windows-only in <code>node_modules</code>); runs normally on your machine</td></tr>
+    </tbody>
+  </table>
+  <h3>Starter test suite added</h3>
+  <p>
+    A dependency-free backend suite was added using Node&rsquo;s built-in test runner
+    (<code>node:test</code>), so it needs no new packages and runs on Node 20+. A new
+    <code>npm test</code> script compiles the TypeScript and runs the tests against the compiled
+    output:
+  </p>
+  <table>
+    <thead><tr><th>File</th><th>Covers</th></tr></thead>
+    <tbody>
+      <tr><td><code>backend/tests/pagination.test.cjs</code></td><td><code>getPagination</code> clamping (limit 1–100, page&nbsp;&ge;&nbsp;1, skip math, sort direction) and <code>paginated</code> meta / <code>totalPages</code> rounding</td></tr>
+      <tr><td><code>backend/tests/permissions.test.cjs</code></td><td>Permission engine: allow/deny override precedence, admin path, Map vs object overrides, completeness of the computed map, <code>normalizePermissionOverrides</code></td></tr>
+      <tr><td><code>backend/tests/tokens.test.cjs</code></td><td>Access/refresh sign+verify round-trips, throw on tampered token, access vs refresh secret separation, opaque-token shape/uniqueness</td></tr>
+      <tr><td><code>backend/tests/appError.test.cjs</code></td><td><code>AppError</code> status/code/details and default status</td></tr>
+      <tr><td><code>frontend/src/lib/utils.test.ts</code></td><td><code>cn()</code> class merging (Tailwind conflict resolution, falsy filtering, arrays)</td></tr>
+      <tr><td><code>frontend/src/lib/api.test.ts</code></td><td><code>tokenStore</code> get/set/clear, <code>normalizeUser</code> asset-URL logic, <code>ApiError</code> defaults, <code>getApiErrorMessage</code></td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <b>Note on execution.</b> The tests are written against the current source and are intended to
+    run via <code>npm test</code> (backend) and <code>npm run test</code>/<code>vitest</code>
+    (frontend) on your machine. They could not be <em>executed</em> during this pass because the
+    sandbox&rsquo;s Linux shell became unavailable mid-session; the test <em>files</em> and scripts
+    are in place. Run <code>cd backend &amp;&amp; npm test</code> to confirm — see §8.
+  </div>
+
+  <h2 id="changes">7. Changes applied in this pass</h2>
+  <p><b>File:</b> <code>backend/src/middlewares/auth.middleware.ts</code> — fixes AUTH-1 (and the same latent defect in <code>requirePermission</code>).</p>
+  <pre><span class="add">+ import { verifyAccessToken, type AccessPayload } from "../utils/tokens";</span>
+<span class="add">+ import { asyncHandler } from "./asyncHandler";</span>
+
+<span class="rm">- export const authenticate = async (req, _res, next) =&gt; {</span>
+<span class="rm">-   const payload = verifyAccessToken(token);   // throws on expired token</span>
+<span class="add">+ export const authenticate = asyncHandler(async (req, _res, next) =&gt; {</span>
+<span class="add">+   let payload: AccessPayload;</span>
+<span class="add">+   try {</span>
+<span class="add">+     payload = verifyAccessToken(token);</span>
+<span class="add">+   } catch {</span>
+<span class="add">+     return next(new AppError("Invalid or expired token", 401, "INVALID_TOKEN"));</span>
+<span class="add">+   }</span>
+    ...
+<span class="add">+ });   // wrapped so any async rejection is forwarded to next()</span>
+
+<span class="rm">- export const requirePermission = (permission) =&gt; async (req, _res, next) =&gt; { ... };</span>
+<span class="add">+ export const requirePermission = (permission) =&gt;</span>
+<span class="add">+   asyncHandler(async (req, _res, next) =&gt; { ... });</span></pre>
+  <p><small>Rationale: reuse the codebase&rsquo;s existing <code>asyncHandler</code> pattern, and map token-verification
+    failures to <code>401</code> so the frontend refresh-on-401 flow continues to work. Verification via
+    <code>tsc</code>/<code>eslint</code>/tests is pending re-running the toolchain (shell unavailable this session);
+    the change is type-safe by construction and confined to one file.</small></p>
+
+  <h2 id="plan">8. Phased remediation plan</h2>
+
+  <div class="phase">
+    <h3>Phase 0 — <span class="done">Done in this pass</span></h3>
+    <p>AUTH-1: auth-middleware unhandled rejection fixed; starter test suite + <code>npm test</code> added.
+       <b>Next action for you:</b> run <code>cd backend &amp;&amp; npm test</code> and <code>npm run lint</code> to confirm green on your machine.</p>
+  </div>
+  <div class="phase">
+    <h3>Phase 1 — Security (do next)</h3>
+    <p>SEC-1 (move JWTs out of <code>localStorage</code> into <code>httpOnly</code> cookies) and SEC-2 (validate upload
+       by magic bytes, server-side filename, safe serving). These two together close the account-takeover chain.</p>
+  </div>
+  <div class="phase">
+    <h3>Phase 2 — Build &amp; correctness</h3>
+    <p>BUILD-1/BUILD-2 (unblock the frontend type-check), DATA-1 (filter before pagination),
+       AUTH-2 (single-flight refresh), STREAK-2 (streak off-by-one).</p>
+  </div>
+  <div class="phase">
+    <h3>Phase 3 — Performance</h3>
+    <p>PERF-1 (replace the streak N+1 with range/aggregate queries). Highest user-visible latency win.</p>
+  </div>
+  <div class="phase">
+    <h3>Phase 4 — Product decision &amp; cleanup</h3>
+    <p>PAY-0: decide free-for-everyone vs. reinstating the paywall, then either delete the dead billing/permission
+       code or reintroduce it behind one feature flag. Fold in the §5.4 low-severity cleanups (DATA-2, UX-1/UX-2, email escaping, timeouts, <code>.env</code> ignore, router links).</p>
+  </div>
+
+  <hr />
+  <p><small><b>Appendix — running the tests.</b>
+    Backend: <code>cd backend &amp;&amp; npm test</code> (compiles to <code>dist/</code>, then runs
+    <code>node --test tests/</code>; use <code>npm run test:only</code> to skip the rebuild).
+    Frontend: <code>cd frontend &amp;&amp; npm run test</code> (Vitest). Both suites are dependency-free
+    beyond what the project already installs.
+    Sandbox caveat: this environment mounts Windows <code>node_modules</code> into Linux and blocks the npm
+    registry, so <code>vitest</code>/<code>tsx</code> and any install cannot run here — they work normally on your machine.
+  </small></p>
+  <p><small>Prepared 12 September 2026 · Habbiters full-stack audit · to regenerate this document as a true PDF, open it in a browser and choose Print &rarr; Save as PDF (A4).</small></p>
+
+</div>
+</body>
+</html>
