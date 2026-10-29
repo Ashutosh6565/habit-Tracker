@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { api, getApiErrorMessage, type ApiHabit } from "@/lib/api";
 import { GUEST_TRACKER_HABITS_KEY, readGuestJson } from "@/lib/guestStorage";
+import { tapFeedback } from "@/lib/native";
 
 type GuestHabit = {
   id: number;
@@ -93,6 +94,7 @@ const Tracker = () => {
     if (!habit) return;
     const newCompleted = !habit.completed;
     const newStreak = newCompleted ? habit.streak + 1 : Math.max(0, habit.streak - 1);
+    tapFeedback();
     setHabits((prev) => prev.map((h) => (h.id === id ? { ...h, completed: newCompleted, streak: newStreak } : h)));
     if (isGuest) return;
     try {

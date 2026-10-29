@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlarmClock, BookOpen, Check, Dumbbell, PartyPopper, RotateCcw, Trophy, Zap } from "lucide-react";
+import { tapFeedback } from "@/lib/native";
 
 const microHabits = [
   { id: "wake", label: "Wake up at 6:00", xp: 15, icon: AlarmClock },
@@ -19,6 +20,7 @@ export default function TryHabitDemo() {
   const complete = done.size === microHabits.length;
 
   const toggle = (id: string) => {
+    tapFeedback();
     setDone((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);

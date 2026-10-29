@@ -1,0 +1,22 @@
+# Android build outputs
+*.iml
+.gradle/
+build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Web bundle copied in by `cap sync` (rebuilt from ../frontend)
+app/src/main/assets/public/
+
+# Local machine paths and signing secrets (never commit)
+local.properties
+keystore.properties
+KEYSTORE-CREDENTIALS.txt
+*.jks
+*.keystore
+
+# Editor files
+.idea/
+.DS_Store

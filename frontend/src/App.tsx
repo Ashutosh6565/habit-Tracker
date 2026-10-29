@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { ThemeProvider } from "next-themes";
@@ -11,6 +11,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AmbientBackground from "@/components/decor/AmbientBackground";
 import StickerField from "@/components/decor/StickerField";
+import { hideSplash, initNativeShell, isNativeApp } from "@/lib/native";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Tracker from "./pages/Tracker";
@@ -33,6 +34,7 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Security from "./pages/Security";
+import DeleteAccount from "./pages/DeleteAccount";
 import NotFound from "./pages/NotFound";
 import HabitCoach from "./components/HabitCoach";
 
@@ -85,6 +87,7 @@ const AnimatedRoutes = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/security" element={<Security />} />
+            <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </motion.div>
@@ -93,7 +96,18 @@ const AnimatedRoutes = () => {
   );
 };
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    initNativeShell();
+    const timer = window.setTimeout(hideSplash, 350);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  // The WebView in the Android build has no server to rewrite deep paths, so the
+  // app uses hash routes. The website keeps clean URLs.
+  const Router = isNativeApp ? HashRouter : BrowserRouter;
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
@@ -101,15 +115,16 @@ const App = () => (
         <HabitProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <Router>
             <HabitCoach />
             <AnimatedRoutes />
-          </BrowserRouter>
+          </Router>
         </HabitProvider>
       </AuthProvider>
       </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

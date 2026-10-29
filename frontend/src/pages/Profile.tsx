@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Camera, Loader2, Save, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, AlertTriangle, Camera, Loader2, Save, Trash2, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { api, getApiErrorMessage } from "@/lib/api";
 
 const Profile = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -18,6 +18,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -62,8 +66,21 @@ const Profile = () => {
     }
   };
 
-  if (loading) {
-    return (
+  const handleDeleteAccount = async () => {
+    if (!user || deleteConfirm !== "DELETE") return;
+    setDeleting(true);
+    try {
+      await api.users.deleteAccount(user.hasPassword ? deletePassword : undefined);
+      await signOut().catch(() => {});
+      toast({ title: "Account deleted", description: "Your data has been removed." });
+      navigate("/", { replace: true });
+    } catch (error) {
+      toast({ title: "Could not delete account", description: getApiErrorMessage(error), variant: "destructive" });
+      setDeleting(false);
+    }
+  };
+
+  if (loading) {    return (
       <div className="min-h-screen">
         <Navbar />
         <div className="flex items-center justify-center pt-40">
@@ -148,6 +165,80 @@ const Profile = () => {
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Save Changes</>}
               </button>
+            </div>
+          </motion.div>
+
+          {/* Danger zone */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 bg-card border border-destructive/30 rounded-2xl p-6"
+          >
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h2 className="font-display font-bold text-foreground">Delete account</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Permanently remove your account, habits, XP, and subscription records. This cannot be undone.
+                </p>
+
+                {!deleteOpen ? (
+                  <button
+                    onClick={() => setDeleteOpen(true)}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-destructive/40 text-destructive text-sm font-semibold hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" /> Delete my account
+                  </button>
+                ) : (
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-foreground mb-1 block">
+                        Type <span className="font-mono font-bold">DELETE</span> to confirm
+                      </label>
+                      <input
+                        type="text"
+                        value={deleteConfirm}
+                        onChange={(e) => setDeleteConfirm(e.target.value)}
+                        autoComplete="off"
+                        className="w-full px-3 py-2 rounded-xl border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    </div>
+                    {user?.hasPassword && (
+                      <div>
+                        <label className="text-xs font-medium text-foreground mb-1 block">Current password</label>
+                        <input
+                          type="password"
+                          value={deletePassword}
+                          onChange={(e) => setDeletePassword(e.target.value)}
+                          autoComplete="current-password"
+                          className="w-full px-3 py-2 rounded-xl border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </div>
+                    )}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={handleDeleteAccount}
+                        disabled={deleting || deleteConfirm !== "DELETE" || (Boolean(user?.hasPassword) && deletePassword.length === 0)}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40"
+                      >
+                        {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Trash2 className="w-4 h-4" /> Permanently delete</>}
+                      </button>
+                      <button
+                        onClick={() => { setDeleteOpen(false); setDeleteConfirm(""); setDeletePassword(""); }}
+                        disabled={deleting}
+                        className="px-4 py-2 rounded-xl border border-border text-foreground text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-xs text-muted-foreground mt-3">
+                  Prefer a web page? Use <Link to="/delete-account" className="text-primary hover:underline">habbiters.app/delete-account</Link>.
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>

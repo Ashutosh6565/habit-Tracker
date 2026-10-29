@@ -54,6 +54,7 @@ export interface ApiUser {
   avatarUrl: string | null;
   role: "user" | "admin";
   isEmailVerified: boolean;
+  hasPassword?: boolean;
   settings?: Record<string, unknown>;
   subscription?: SubscriptionInfo;
   permissions?: Record<string, boolean>;
@@ -504,6 +505,12 @@ export const api = {
         body: form,
       });
       return { ...data, avatarUrl: normalizeAssetUrl(data.avatarUrl), user: normalizeUser(data.user) };
+    },
+    deleteAccount(currentPassword?: string) {
+      return request<{ deleted: true }>("/users/me", {
+        method: "DELETE",
+        body: JSON.stringify(currentPassword ? { confirm: "DELETE", currentPassword } : { confirm: "DELETE" }),
+      });
     },
     listAdminUsers() {
       return request<{ users: AdminUserRowDto[] }>("/users");

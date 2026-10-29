@@ -7,6 +7,7 @@ import {
   adminSubscriptionSchema,
   adminPermissionSchema,
   adminUpdateUserSchema,
+  deleteAccountSchema,
   objectIdParamSchema,
   updateProfileSchema,
 } from "../validators/user.validator";
@@ -16,6 +17,7 @@ export const userRouter = Router();
 userRouter.use(authenticate);
 userRouter.patch("/me", validate({ body: updateProfileSchema }), userController.updateProfile);
 userRouter.post("/me/avatar", avatarUpload.single("avatar"), userController.uploadAvatar);
+userRouter.delete("/me", validate({ body: deleteAccountSchema }), userController.deleteAccount);
 userRouter.get("/", authorize("admin"), userController.listUsers);
 userRouter.get("/permissions/catalog", authorize("admin"), userController.permissionCatalog);
 userRouter.patch(

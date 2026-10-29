@@ -6,7 +6,7 @@ import { permissionService, normalizePermissionOverrides } from "./permission.se
 import type { PermissionKey, PermissionOverride } from "../config/permissions";
 
 export const serializeUser = async (userId: string) => {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("+password");
   if (!user) throw new AppError("User not found", 404, "USER_NOT_FOUND");
   const subscription = await Subscription.findOne({ user: user.id });
   const permissions = permissionService.compute(user, subscription);
@@ -17,6 +17,7 @@ export const serializeUser = async (userId: string) => {
     avatarUrl: user.avatarUrl || null,
     role: user.role,
     isEmailVerified: user.isEmailVerified,
+    hasPassword: Boolean(user.password),
     settings: user.settings,
     permissions,
     permissionOverrides: normalizePermissionOverrides(user.permissionOverrides),

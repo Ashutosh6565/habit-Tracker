@@ -19,10 +19,13 @@ build/
 .env
 .env.*
 !.env.example
+!.env.mobile
 *.pem
 *.key
 *.p12
 *.pfx
+*.jks
+*.keystore
 
 # Runtime user uploads (avatars, attachments)
 backend/uploads/*
@@ -53,6 +56,9 @@ test-results/
 .tmp-shots/
 *.local
 
+# Hand-off binaries (APK / AAB) are built locally, not committed
+artifacts/
+
 # Editors and OS files
 .vscode/*
 !.vscode/extensions.json
@@ -62,3 +68,4 @@ test-results/
 .DS_Store
 Thumbs.db
 desktop.ini
+.tooling/

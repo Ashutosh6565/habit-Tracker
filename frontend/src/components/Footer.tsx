@@ -39,6 +39,7 @@ const Footer = () => (
               { label: "Privacy", path: "/privacy" },
               { label: "Terms", path: "/terms" },
               { label: "Security", path: "/security" },
+              { label: "Delete account", path: "/delete-account" },
             ],
           },
         ].map((col) => (

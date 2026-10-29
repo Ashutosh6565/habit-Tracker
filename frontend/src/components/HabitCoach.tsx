@@ -64,7 +64,7 @@ const HabitCoach = () => {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/25 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="fixed bottom-5 right-5 z-40 native-float inline-flex items-center gap-2 rounded-full gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/25 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         aria-label="Open Habit Coach"
       >
         <MessageCircle className="h-5 w-5" />

@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
 import { api, getApiErrorMessage, type PaymentClaimDto, type PaymentPlanDto, type PlanCode } from "@/lib/api";
+import { isNativeApp, openExternal } from "@/lib/native";
 import { useToast } from "@/hooks/use-toast";
 
 const formatRupees = (paise: number) => `₹${Math.round(paise / 100)}`;
@@ -107,9 +108,18 @@ const Pricing = () => {
 
   const openPaymentPage = (plan: PlanCode) => {
     if (!user) return;
+    // Google Play requires its own billing for digital subscriptions, so the
+    // Android build does not route users to the Razorpay page.
+    if (isNativeApp) {
+      toast({
+        title: "Upgrades aren't available in the app yet",
+        description: "Your current plan keeps working. Paid plans are managed on the website.",
+      });
+      return;
+    }
     setSelectedPlan(plan);
     if (plansData?.paymentLink) {
-      window.open(plansData.paymentLink, "_blank", "noopener,noreferrer");
+      openExternal(plansData.paymentLink);
     }
     setTimeout(() => {
       document.getElementById("payment-claim")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -150,7 +160,9 @@ const Pricing = () => {
           <div className="text-center mb-10">
             <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">Simple Pricing in Rupees</h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Start free with a 7-day premium trial. Pay securely on Razorpay, submit your payment reference, and an admin activates your plan.
+              {isNativeApp
+                ? "Your plan works across the app and the website. Paid upgrades are not sold inside the Android app."
+                : "Start free with a 7-day premium trial. Pay securely on Razorpay, submit your payment reference, and an admin activates your plan."}
             </p>
             {subscription?.isTrialing && (
               <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-600 text-sm font-medium">
@@ -245,7 +257,16 @@ const Pricing = () => {
             </div>
           )}
 
-          {user && (
+          {isNativeApp && (
+            <div className="mt-10 rounded-2xl border border-border bg-card p-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                The Android app is free to use. If you already have a paid plan, it applies to this account
+                automatically.
+              </p>
+            </div>
+          )}
+
+          {user && !isNativeApp && (
             <div id="payment-claim" className="mt-10 grid lg:grid-cols-[1fr_360px] gap-6 items-start">
               <motion.form onSubmit={submitClaim} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 className="glass rounded-2xl p-6 md:p-8 space-y-5">

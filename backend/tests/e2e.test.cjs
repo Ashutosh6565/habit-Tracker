@@ -558,6 +558,62 @@ test("habbiters API end-to-end", async (t) => {
     assert.equal(missing.data.error.code, "NOT_FOUND");
   });
 
+  await t.test("account deletion requires confirmation and removes all data", async () => {
+    const victim = await signup("Leaving User", "leaving.user@example.com");
+
+    const habit = await api("/habits", {
+      method: "POST",
+      token: victim.session.accessToken,
+      body: { title: "Old habit", category: "Health", icon: "🚶", difficulty: "easy" },
+    });
+    assert.equal(habit.status, 201, JSON.stringify(habit.data));
+
+    const me = await api("/auth/me", { token: victim.session.accessToken });
+    assert.equal(me.status, 200, JSON.stringify(me.data));
+    assert.equal(me.data.data.user.hasPassword, true);
+
+    const wrongWord = await api("/users/me", {
+      method: "DELETE",
+      token: victim.session.accessToken,
+      body: { confirm: "delete" },
+    });
+    assert.equal(wrongWord.status, 400, JSON.stringify(wrongWord.data));
+
+    const noPassword = await api("/users/me", {
+      method: "DELETE",
+      token: victim.session.accessToken,
+      body: { confirm: "DELETE" },
+    });
+    assert.equal(noPassword.status, 400, JSON.stringify(noPassword.data));
+    assert.equal(noPassword.data.error.code, "PASSWORD_REQUIRED");
+
+    const wrongPassword = await api("/users/me", {
+      method: "DELETE",
+      token: victim.session.accessToken,
+      body: { confirm: "DELETE", currentPassword: "NotMyPassword1!" },
+    });
+    assert.equal(wrongPassword.status, 401, JSON.stringify(wrongPassword.data));
+
+    const deleted = await api("/users/me", {
+      method: "DELETE",
+      token: victim.session.accessToken,
+      body: { confirm: "DELETE", currentPassword: "Password123!" },
+    });
+    assert.equal(deleted.status, 200, JSON.stringify(deleted.data));
+    assert.equal(deleted.data.data.deleted, true);
+
+    const login = await api("/auth/login", {
+      method: "POST",
+      body: { email: "leaving.user@example.com", password: "Password123!" },
+    });
+    assert.equal(login.status, 401, JSON.stringify(login.data));
+
+    const { User } = require("../dist/models/User.js");
+    const { Habit } = require("../dist/models/Habit.js");
+    assert.equal(await User.countDocuments({ email: "leaving.user@example.com" }), 0);
+    assert.equal(await Habit.countDocuments({ title: "Old habit" }), 0);
+  });
+
   await new Promise((resolve) => server.close(resolve));
   await mongoose.disconnect();
   await mongod.stop();

@@ -7,6 +7,11 @@ export const updateProfileSchema = z.object({
   avatarUrl: z.string().url().optional().nullable(),
 });
 
+export const deleteAccountSchema = z.object({
+  confirm: z.literal("DELETE"),
+  currentPassword: z.string().min(8).max(128).optional(),
+});
+
 export const adminUpdateUserSchema = z.object({
   fullName: z.string().trim().min(2).max(120).optional(),
   email: z.string().trim().email().toLowerCase().optional(),

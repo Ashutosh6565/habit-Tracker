@@ -299,3 +299,23 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Android/iOS app shell (Capacitor injects --safe-area-inset-* variables). */
+.native-app {
+  overscroll-behavior-y: none;
+}
+
+.native-app body {
+  padding-top: var(--safe-area-inset-top, 0px);
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.native-app .native-nav {
+  top: var(--safe-area-inset-top, 0px);
+}
+
+.native-app .native-float {
+  bottom: calc(1.25rem + var(--safe-area-inset-bottom, 0px));
+}

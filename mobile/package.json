@@ -1,0 +1,30 @@
+{
+  "name": "habbiters-mobile",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Android app shell for Habbiters. The screens live in ../frontend and are shared with the website.",
+  "scripts": {
+    "assets": "node scripts/generate-app-assets.mjs && capacitor-assets generate --android --iconBackgroundColor \"#16A34A\" --iconBackgroundColorDark \"#0C1F16\" --splashBackgroundColor \"#0C1F16\" --splashBackgroundColorDark \"#0C1F16\"",
+    "build:web": "npm --prefix ../frontend run build:mobile",
+    "sync": "npm run build:web && cap sync android",
+    "android:debug": "npm run sync && cd android && gradlew.bat assembleDebug",
+    "android:release": "npm run sync && cd android && gradlew.bat bundleRelease",
+    "android:open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/keyboard": "^8.0.6",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "sharp": "^0.32.6"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.6.0"
+  }
+}

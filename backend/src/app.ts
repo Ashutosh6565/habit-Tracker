@@ -16,12 +16,16 @@ import { apiRouter } from "./routes";
 export const createApp = () => {
   const app = express();
 
+  // The Android app renders the web build from a local origin inside the device.
+  const nativeOrigins = new Set(["https://localhost", "capacitor://localhost"]);
+
   app.set("trust proxy", 1);
   app.use(helmet());
   app.use(
     cors({
       origin(origin, callback) {
         if (!origin || env.corsOrigin.includes(origin)) return callback(null, true);
+        if (nativeOrigins.has(origin)) return callback(null, true);
         // Vite picks a different port whenever 5173 is taken; in dev any localhost
         // port is the same machine, so allow it instead of breaking the API.
         if (!env.isProduction && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {

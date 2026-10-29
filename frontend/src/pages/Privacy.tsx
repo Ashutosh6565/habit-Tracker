@@ -48,7 +48,7 @@ const sections: LegalSection[] = [
     bullets: [
       "Access — view everything we store about you from your Profile page.",
       "Export — request a copy of your data by emailing us.",
-      "Deletion — delete your account and all associated data from your Profile page, or ask us to do it.",
+      "Deletion — delete your account and all associated data from Profile → Delete account, or from habbiters.app/delete-account.",
       "Correction — update your name, avatar, and email from your Profile page.",
     ],
   },
@@ -56,7 +56,7 @@ const sections: LegalSection[] = [
     id: "data-retention",
     heading: "Data Retention",
     paragraphs: [
-      "We keep your data for as long as your account is active. When you delete your account, your personal data and habit records are permanently removed from our database within 30 days. Anonymized aggregate statistics may be retained.",
+      "We keep your data for as long as your account is active. When you delete your account, your personal data and habit records are permanently removed from our database immediately. Anonymized aggregate statistics may be retained.",
     ],
   },
   {

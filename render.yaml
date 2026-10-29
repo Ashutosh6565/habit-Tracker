@@ -1,0 +1,86 @@
+# Render Blueprint for Habbiters.
+# Creates the API (Express) and the website (Vite static site).
+# The Android app talks to the API at https://habbiters-api.onrender.com/api/v1
+#
+# After the first deploy, open the API service -> Environment and fill in the
+# values marked `sync: false` (they are secrets and are never stored in git).
+services:
+  - type: web
+    name: habbiters-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.11.0
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: COOKIE_SECRET
+        sync: false
+      - key: ACCESS_TOKEN_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_TOKEN_EXPIRES_IN
+        value: 30d
+      - key: FRONTEND_URL
+        value: https://habbiters-web.onrender.com
+      - key: CORS_ORIGIN
+        value: https://habbiters-web.onrender.com,https://habbiters.app,https://www.habbiters.app,https://localhost,capacitor://localhost
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        value: Habbiters <no-reply@habbiters.app>
+      - key: BREVO_API_KEY
+        sync: false
+      - key: SUPPORT_EMAIL
+        value: support@habbiters.app
+      - key: CONTACT_INBOX
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_PAYMENT_LINK
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+  - type: web
+    name: habbiters-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://habbiters-api.onrender.com/api/v1
+      - key: VITE_SITE_URL
+        value: https://habbiters.app
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
