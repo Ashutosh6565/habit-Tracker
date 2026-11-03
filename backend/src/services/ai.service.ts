@@ -289,7 +289,11 @@ const geminiRecommendation = async (
     );
 
     if (!response.ok) {
-      logger.warn("Gemini recommendation request failed", { status: response.status });
+      const detail = await response.text().catch(() => "");
+      logger.warn("Gemini recommendation request failed", {
+        status: response.status,
+        detail: detail.slice(0, 300),
+      });
       return null;
     }
 
