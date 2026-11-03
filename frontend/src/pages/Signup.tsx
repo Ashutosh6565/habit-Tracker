@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame, Mail, Lock, User, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -18,6 +18,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const { requestSignupOtp, verifySignupOtp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = typeof location.state?.from === "string" ? location.state.from : "/dashboard";
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +55,7 @@ const Signup = () => {
       toast({ title: "Verification failed", description: getApiErrorMessage(error), variant: "destructive" });
     } else {
       toast({ title: "Account verified", description: "Welcome to Habbiters." });
-      navigate("/dashboard");
+      navigate(redirectTo);
     }
   };
 
@@ -71,6 +73,9 @@ const Signup = () => {
           <p className="text-muted-foreground text-sm mt-1">
             {step === "details" ? "Start building better habits today" : "Verify your email to finish signup"}
           </p>
+          {location.state?.from === "/templates" && step === "details" && (
+            <p className="text-primary text-sm mt-2 font-medium">Create a free account to start this template.</p>
+          )}
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8">
@@ -150,7 +155,7 @@ const Signup = () => {
           )}
           <div className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">Log in</Link>
+            <Link to="/login" state={location.state} className="text-primary font-medium hover:underline">Log in</Link>
           </div>
         </div>
       </motion.div>

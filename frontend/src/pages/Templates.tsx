@@ -168,6 +168,10 @@ const Templates = () => {
   };
 
   const openTemplate = (t: TemplateOption) => {
+    if (!user) {
+      navigate("/signup", { state: { from: "/templates" } });
+      return;
+    }
     setSelectedId(t.templateId);
     if (!customHabits[t.templateId]) {
       setCustomHabits((prev) => ({ ...prev, [t.templateId]: [...t.habits] }));
