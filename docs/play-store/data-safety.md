@@ -10,7 +10,7 @@ between these answers and the privacy policy is the most common rejection reason
 | Does your app collect or share any of the required user data types? | **Yes** |
 | Is all of the user data collected by your app encrypted in transit? | **Yes** (HTTPS only) |
 | Do you provide a way for users to request that their data is deleted? | **Yes** |
-| Account deletion request URL | `https://habbiters.app/delete-account` |
+| Account deletion request URL | `https://habbit-tracker.us.cc/delete-account` |
 
 ## Section 2 — Data types
 

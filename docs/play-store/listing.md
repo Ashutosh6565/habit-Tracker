@@ -45,7 +45,7 @@ BUILT FOR REAL LIFE
 Most habit apps ask for a perfect month. Habbiters asks for one small rep today. The mobile app is designed for the way people actually behave: quick taps, clear progress, and no guilt when a busy week happens.
 
 PRIVATE BY DEFAULT
-Your habits belong to you. No ads, no selling your data, no third-party trackers. You can delete your account and all of your data at any time from Profile → Delete account, or from habbiters.app/delete-account.
+Your habits belong to you. No ads, no selling your data, no third-party trackers. You can delete your account and all of your data at any time from Profile → Delete account, or from habbit-tracker.us.cc/delete-account.
 
 FREE, FOR REAL
 Habit building is hard enough without your tools working against your wallet. Habbiters is free to use in full — the tracker, all 105 templates, the planner, time tracking, analytics and gamification. There is nothing to unlock.
@@ -70,9 +70,9 @@ description above. Keep this list as the reference for graphics text and future 
 ## Contact details
 
 - Email: `support@habbiters.app`
-- Website: `https://habbiters.app`
-- Privacy policy: `https://habbiters.app/privacy`
-- Account deletion: `https://habbiters.app/delete-account`
+- Website: `https://habbit-tracker.us.cc`
+- Privacy policy: `https://habbit-tracker.us.cc/privacy`
+- Account deletion: `https://habbit-tracker.us.cc/delete-account`
 
 ## Graphics checklist
 

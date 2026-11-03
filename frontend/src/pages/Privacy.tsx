@@ -47,7 +47,7 @@ const sections: LegalSection[] = [
     bullets: [
       "Access — view everything we store about you from your Profile page.",
       "Export — request a copy of your data by emailing us.",
-      "Deletion — delete your account and all associated data from Profile → Delete account, or from habbiters.app/delete-account.",
+      "Deletion — delete your account and all associated data from Profile → Delete account, or from habbit-tracker.us.cc/delete-account.",
       "Correction — update your name, avatar, and email from your Profile page.",
     ],
   },

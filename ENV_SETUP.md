@@ -46,7 +46,7 @@ Port 587 uses STARTTLS; use 465 if your host blocks 587. Restart the API and req
 ```env
 VITE_API_URL=http://localhost:5000/api/v1
 VITE_GOOGLE_CLIENT_ID=
-VITE_SITE_URL=https://habbiters.app
+VITE_SITE_URL=https://habbit-tracker.us.cc
 ```
 
 ## Stripe

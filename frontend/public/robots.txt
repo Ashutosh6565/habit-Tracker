@@ -11,4 +11,4 @@ Disallow: /login
 Disallow: /forgot-password
 Disallow: /reset-password
 
-Sitemap: https://habbiters.app/sitemap.xml
+Sitemap: https://habbit-tracker.us.cc/sitemap.xml

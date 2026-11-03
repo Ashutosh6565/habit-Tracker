@@ -32,9 +32,9 @@ services:
       - key: REFRESH_TOKEN_EXPIRES_IN
         value: 30d
       - key: FRONTEND_URL
-        value: https://habbiters-web.onrender.com
+        value: https://habbit-tracker.us.cc
       - key: CORS_ORIGIN
-        value: https://habbiters-web.onrender.com,https://habbiters.app,https://www.habbiters.app,https://localhost,capacitor://localhost
+        value: https://habbit-tracker.us.cc,https://www.habbit-tracker.us.cc,https://habbiters-web.onrender.com,https://localhost,capacitor://localhost
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
@@ -73,7 +73,7 @@ services:
       - key: VITE_API_URL
         value: https://habbiters-api.onrender.com/api/v1
       - key: VITE_SITE_URL
-        value: https://habbiters.app
+        value: https://habbit-tracker.us.cc
     routes:
       - type: rewrite
         source: /*

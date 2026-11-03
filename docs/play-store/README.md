@@ -86,9 +86,9 @@ cd mobile/android && ./gradlew.bat bundleRelease
    - App icon: use `mobile/assets/icon-only.png` (512×512 version is generated automatically by Play — upload the 1024×1024 source).
    - Feature graphic: 1024×500 (make a simple green banner with the flame + "Habbiters").
    - Phone screenshots: at least 2, taken from the app on a phone (Today with the Momentum card, Templates, Time, Analytics, Tasks).
-5. **Privacy policy URL:** `https://habbiters.app/privacy`
+5. **Privacy policy URL:** `https://habbit-tracker.us.cc/privacy`
    (or `https://habbiters-web.onrender.com/privacy` until the domain is connected).
-6. **Account deletion URL:** `https://habbiters.app/delete-account`
+6. **Account deletion URL:** `https://habbit-tracker.us.cc/delete-account`
    (or the `onrender.com` equivalent). Play now requires this for every app that allows accounts.
 7. **App access (reviewers need this):** create a demo account before submitting, for example
    `reviewer@habbiters.app` with a strong password, and add some habits so the dashboard is

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const SITE_URL = "https://habbiters.app";
+export const SITE_URL = "https://habbit-tracker.us.cc";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 type Meta = {

@@ -236,7 +236,7 @@ const Profile = () => {
                 )}
 
                 <p className="text-xs text-muted-foreground mt-3">
-                  Prefer a web page? Use <Link to="/delete-account" className="text-primary hover:underline">habbiters.app/delete-account</Link>.
+                  Prefer a web page? Use <Link to="/delete-account" className="text-primary hover:underline">habbit-tracker.us.cc/delete-account</Link>.
                 </p>
               </div>
             </div>
