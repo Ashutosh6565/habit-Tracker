@@ -80,9 +80,16 @@ const loadWithCache = async <T,>(
   }
 };
 
-export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
+export const MobileDataProvider = ({
+  children,
+  onRequireAuth,
+}: {
+  children: ReactNode;
+  onRequireAuth?: () => void;
+}) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const guest = !user;
   const userId = user?.id || "guest";
   const [toast, setToast] = useState<string | null>(null);
   const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
@@ -119,12 +126,17 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     window.setTimeout(() => setToast((current) => (current === message ? null : current)), 2200);
   }, []);
 
+  const requireAuth = useCallback(() => {
+    onRequireAuth?.();
+  }, [onRequireAuth]);
+
   const summaryQuery = useQuery({
     queryKey: qk("summary"),
     queryFn: cached<HabitSummary>("summary", () => api.habits.summary()),
     initialData: cachedInitial<HabitSummary>("summary"),
     initialDataUpdatedAt: 0,
     staleTime: 20_000,
+    enabled: !guest,
   });
 
   const historyQuery = useQuery({
@@ -133,6 +145,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     initialData: cachedInitial<HabitHistoryDto>("history"),
     initialDataUpdatedAt: 0,
     staleTime: 60_000,
+    enabled: !guest,
   });
 
   const analyticsQuery = useQuery({
@@ -141,6 +154,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     initialData: cachedInitial<AnalyticsOverviewDto>("analytics"),
     initialDataUpdatedAt: 0,
     staleTime: 60_000,
+    enabled: !guest,
   });
 
   const templatesQuery = useQuery({
@@ -157,6 +171,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     initialData: cachedInitial<PlannerTaskDto[]>("tasks"),
     initialDataUpdatedAt: 0,
     staleTime: 20_000,
+    enabled: !guest,
   });
 
   const notesQuery = useQuery({
@@ -165,6 +180,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     initialData: cachedInitial<PlannerNoteDto[]>("notes"),
     initialDataUpdatedAt: 0,
     staleTime: 30_000,
+    enabled: !guest,
   });
 
   const timeQuery = useQuery({
@@ -173,6 +189,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     initialData: cachedInitial<PlannerTimeDto>("time"),
     initialDataUpdatedAt: 0,
     staleTime: 30_000,
+    enabled: !guest,
   });
 
   const refreshDerived = useCallback(() => {
@@ -310,16 +327,45 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       offline,
       toast,
       notify,
-      toggleHabit: (habit) => toggleMutation.mutate({ habit }),
-      createHabit: (draft) => createHabitMutation.mutateAsync(draft).then(() => undefined),
-      applyTemplate: (template, habits) =>
-        applyTemplateMutation.mutateAsync({ template, habits }).then((count) => count),
-      toggleTask: (task) => taskToggleMutation.mutate(task),
-      addTask: (draft) => addTaskMutation.mutateAsync(draft).then(() => undefined),
-      deleteTask: (id) => deleteTaskMutation.mutateAsync(id).then(() => undefined),
-      addNote: (text, date) => addNoteMutation.mutateAsync({ text, date }).then(() => undefined),
-      deleteNote: (id) => deleteNoteMutation.mutateAsync(id).then(() => undefined),
-      setTimeCell: (input) => timeMutation.mutateAsync(input).then(() => undefined),
+      toggleHabit: (habit) => {
+        if (guest) return requireAuth();
+        toggleMutation.mutate({ habit });
+      },
+      createHabit: async (draft) => {
+        if (guest) return requireAuth();
+        await createHabitMutation.mutateAsync(draft);
+      },
+      applyTemplate: async (template, habits) => {
+        if (guest) {
+          requireAuth();
+          return 0;
+        }
+        return applyTemplateMutation.mutateAsync({ template, habits });
+      },
+      toggleTask: (task) => {
+        if (guest) return requireAuth();
+        taskToggleMutation.mutate(task);
+      },
+      addTask: async (draft) => {
+        if (guest) return requireAuth();
+        await addTaskMutation.mutateAsync(draft);
+      },
+      deleteTask: async (id) => {
+        if (guest) return requireAuth();
+        await deleteTaskMutation.mutateAsync(id);
+      },
+      addNote: async (text, date) => {
+        if (guest) return requireAuth();
+        await addNoteMutation.mutateAsync({ text, date });
+      },
+      deleteNote: async (id) => {
+        if (guest) return requireAuth();
+        await deleteNoteMutation.mutateAsync(id);
+      },
+      setTimeCell: async (input) => {
+        if (guest) return requireAuth();
+        await timeMutation.mutateAsync(input);
+      },
     }),
     [
       summaryQuery.data,
@@ -333,6 +379,8 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       offline,
       toast,
       notify,
+      guest,
+      requireAuth,
       toggleMutation,
       createHabitMutation,
       applyTemplateMutation,

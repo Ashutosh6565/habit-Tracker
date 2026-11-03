@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BarChart3, CalendarDays, CheckSquare, Home, Leaf, Plus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { warmApi } from "@/lib/api";
 import { setAndroidBackHandler } from "@/lib/backButton";
 import { tapFeedback } from "@/lib/native";
 import { todayISO } from "./date";
+import { clearGuestPreview, ensureGuestPreview } from "./guestPreview";
 import { MB_CATEGORIES, MB_ICONS, Sheet } from "./shared";
 import { MobileAuth } from "./MobileAuth";
 import { MobileDataProvider, useMobileData } from "./useMobileData";
@@ -216,7 +218,7 @@ const NoteSheet = ({ date, onClose }: { date: string; onClose: () => void }) => 
   );
 };
 
-const MobileShell = () => {
+const MobileShell = ({ guest = false, onRequireAuth }: { guest?: boolean; onRequireAuth?: () => void }) => {
   const { toast } = useMobileData();
   const [screen, setScreen] = useState<Screen>("today");
   const [accountOpen, setAccountOpen] = useState(false);
@@ -261,6 +263,10 @@ const MobileShell = () => {
 
   const openAdd = () => {
     tapFeedback();
+    if (guest) {
+      onRequireAuth?.();
+      return;
+    }
     if (screen === "tasks") setAddSheet({ type: "task", date: todayISO() });
     else if (screen === "calendar") setAddSheet({ type: "note", date: todayISO() });
     else if (screen === "time") setTimeSignal((value) => value + 1);
@@ -278,13 +284,22 @@ const MobileShell = () => {
 
   return (
     <div className="hb-app">
+      {guest && (
+        <div className="hb-guest-bar" role="status">
+          <span className="hb-guest-dot" aria-hidden />
+          <span className="hb-guest-copy">Demo preview — nothing is saved yet.</span>
+          <button type="button" onClick={onRequireAuth}>
+            Create account
+          </button>
+        </div>
+      )}
       <main className="hb-main">
         <div className="hb-scroll" key={screen}>
           {screen === "today" && (
             <TodayScreen
               onOpenTime={() => go("time")}
-              onOpenAccount={() => setAccountOpen(true)}
-              onAddHabit={() => setAddSheet({ type: "habit" })}
+              onOpenAccount={() => (guest ? onRequireAuth?.() : setAccountOpen(true))}
+              onAddHabit={() => (guest ? onRequireAuth?.() : setAddSheet({ type: "habit" }))}
               onOpenTemplates={() => openTemplates()}
               onOpenTemplate={(templateId) => openTemplates(templateId)}
               onOpenTasks={() => go("tasks")}
@@ -298,11 +313,15 @@ const MobileShell = () => {
           {screen === "analytics" && <AnalyticsScreen />}
           {screen === "tasks" && (
             <TasksScreen
-              onAddTask={(date) => setAddSheet({ type: "task", date: date || todayISO() })}
+              onAddTask={(date) =>
+                guest ? onRequireAuth?.() : setAddSheet({ type: "task", date: date || todayISO() })
+              }
               onOpenCalendar={() => go("calendar")}
             />
           )}
-          {screen === "calendar" && <CalendarScreen onAddNote={(date) => setAddSheet({ type: "note", date })} />}
+          {screen === "calendar" && (
+            <CalendarScreen onAddNote={(date) => (guest ? onRequireAuth?.() : setAddSheet({ type: "note", date }))} />
+          )}
           {screen === "templates" && (
             <TemplatesScreen
               initialTemplateId={templatesFocus}
@@ -378,19 +397,47 @@ const MobileShell = () => {
 
 export const MobileApp = () => {
   const { user, loading } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
     return () => document.documentElement.classList.remove("dark");
   }, []);
 
+  useEffect(() => {
+    void warmApi();
+  }, []);
+
+  useEffect(() => {
+    if (user) setAuthOpen(false);
+  }, [user]);
+
+  // Seeded during render so the first paint already shows the demo dashboard.
+  useMemo(() => {
+    if (!user) ensureGuestPreview();
+  }, [user]);
+
+  useEffect(() => {
+    if (user) clearGuestPreview();
+  }, [user]);
+
   if (loading) return <Splash label="Restoring your streaks" />;
-  if (!user)
+
+  if (!user) {
+    const requireAuth = () => setAuthOpen(true);
     return (
       <div className="hb-app">
-        <MobileAuth />
+        <MobileDataProvider onRequireAuth={requireAuth}>
+          <MobileShell guest onRequireAuth={requireAuth} />
+          {authOpen && (
+            <div className="hb-auth-overlay">
+              <MobileAuth guest onBack={() => setAuthOpen(false)} />
+            </div>
+          )}
+        </MobileDataProvider>
       </div>
     );
+  }
 
   return (
     <MobileDataProvider>

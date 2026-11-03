@@ -389,6 +389,24 @@ export const normalizeUser = (user: ApiUser): ApiUser => ({
   avatarUrl: normalizeAssetUrl(user.avatarUrl),
 });
 
+const REQUEST_TIMEOUT_MS = 60_000;
+
+const timeoutSignal = () =>
+  typeof AbortSignal !== "undefined" && "timeout" in AbortSignal
+    ? AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+    : undefined;
+
+const fetchFailure = (error: unknown) => {
+  const aborted = error instanceof Error && /abort|timeout/i.test(error.name);
+  return aborted
+    ? new ApiError("The server took too long to answer. Check your connection and try again.", "REQUEST_TIMEOUT", 0)
+    : new ApiError("Can't reach the server right now. Check your connection and try again.", "NETWORK_ERROR", 0);
+};
+
+/** Pings the API so a sleeping free-tier instance starts waking before the user needs it. */
+export const warmApi = () =>
+  fetch(`${ASSET_BASE_URL}/health`, { cache: "no-store" }).catch(() => undefined);
+
 async function request<T>(path: string, options: RequestInit = {}, retry = true): Promise<T> {  const headers = new Headers(options.headers);
   const hasFormData = options.body instanceof FormData;
   if (!hasFormData && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
@@ -398,11 +416,17 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-    credentials: "include",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+      credentials: "include",
+      signal: options.signal ?? timeoutSignal(),
+    });
+  } catch (error) {
+    throw fetchFailure(error);
+  }
 
   if (response.status === 401 && retry && path !== "/auth/refresh") {
     const refreshToken = tokenStore.getRefreshToken();

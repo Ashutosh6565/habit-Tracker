@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Leaf } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type Mode = "signin" | "signup";
 
-export const MobileAuth = () => {
+export const MobileAuth = ({ guest = false, onBack }: { guest?: boolean; onBack?: () => void }) => {
   const { signIn, signUp, requestLoginOtp, verifyLoginOtp } = useAuth();
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(guest ? "signup" : "signin");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +15,16 @@ export const MobileAuth = () => {
   const [otpMode, setOtpMode] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [slow, setSlow] = useState(false);
+
+  useEffect(() => {
+    if (!busy) {
+      setSlow(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setSlow(true), 6000);
+    return () => window.clearTimeout(timer);
+  }, [busy]);
 
   const submitPassword = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -73,6 +83,12 @@ export const MobileAuth = () => {
             ? "Sign in to pick up your streaks, habits and notes right where you left off."
             : "Create a free account. Every habit template is included — no paywalls, ever."}
       </p>
+
+      {guest && (
+        <div className="hb-auth-note">
+          You're exploring the demo. Create a free account to save your own habits, streaks and notes.
+        </div>
+      )}
 
       {otpMode ? (
         <form onSubmit={otpSent ? submitCode : (event) => { event.preventDefault(); void sendCode(); }}>
@@ -167,6 +183,16 @@ export const MobileAuth = () => {
             </button>
           </div>
         </form>
+      )}
+
+      {busy && slow && (
+        <div className="hb-auth-hint">Still connecting — the free server can take up to a minute to wake up.</div>
+      )}
+
+      {onBack && (
+        <button type="button" className="hb-btn-ghost" onClick={onBack} style={{ marginTop: 10 }}>
+          Keep exploring the demo
+        </button>
       )}
 
       <div className="hb-auth-switch">
