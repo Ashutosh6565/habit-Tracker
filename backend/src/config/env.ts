@@ -59,7 +59,7 @@ export const env = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || "",
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
   },
   supportEmail: process.env.SUPPORT_EMAIL || process.env.SMTP_USER || "support@habbiters.app",
   contactInbox: process.env.CONTACT_INBOX || process.env.ADMIN_EMAIL || process.env.SMTP_USER || "",
