@@ -240,92 +240,109 @@ const geminiRecommendation = async (
     "Each reason must be one short sentence (max 18 words), concrete and personal. Never invent template ids.",
   ].join("\n");
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.gemini.model)}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": env.gemini.apiKey,
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [
-              {
-                text:
-                  "You are Habbiters' habit coach. You recommend beginner-friendly routines from a fixed catalog. " +
-                  "You are warm, specific and honest. You never mention medical, financial or mental-health outcomes.",
-              },
-            ],
+  // gemini-3.8-flash answers transient 503s under demand spikes, so try twice
+  // while keeping the whole call inside a 25s budget.
+  const deadline = Date.now() + 25_000;
+  const retryPause = () => new Promise((resolve) => setTimeout(resolve, 800));
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const remaining = deadline - Date.now();
+    if (remaining < 1_000) break;
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.gemini.model)}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": env.gemini.apiKey,
           },
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 768,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "object",
-              properties: {
-                summary: { type: "string" },
-                recommendations: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      templateId: { type: "string" },
-                      reason: { type: "string" },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [
+                {
+                  text:
+                    "You are Habbiters' habit coach. You recommend beginner-friendly routines from a fixed catalog. " +
+                    "You are warm, specific and honest. You never mention medical, financial or mental-health outcomes.",
+                },
+              ],
+            },
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.4,
+              maxOutputTokens: 768,
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: "object",
+                properties: {
+                  summary: { type: "string" },
+                  recommendations: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        templateId: { type: "string" },
+                        reason: { type: "string" },
+                      },
+                      required: ["templateId", "reason"],
                     },
-                    required: ["templateId", "reason"],
                   },
                 },
+                required: ["summary", "recommendations"],
               },
-              required: ["summary", "recommendations"],
             },
-          },
-        }),
-        signal: AbortSignal.timeout(25_000),
+          }),
+          signal: AbortSignal.timeout(remaining),
+        }
+      );
+
+      if (!response.ok) {
+        const detail = await response.text().catch(() => "");
+        logger.warn("Gemini recommendation request failed", {
+          status: response.status,
+          attempt,
+          detail: detail.slice(0, 300),
+        });
+        const retryable = response.status === 429 || response.status >= 500;
+        if (!retryable || attempt === 2) return null;
+        await retryPause();
+        continue;
       }
-    );
 
-    if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      logger.warn("Gemini recommendation request failed", {
-        status: response.status,
-        detail: detail.slice(0, 300),
+      const payload = (await response.json()) as GeminiPayload;
+      const text = (payload.candidates?.[0]?.content?.parts || [])
+        .map((part) => part.text || "")
+        .join("")
+        .trim();
+      if (!text) return null;
+
+      const parsed = JSON.parse(text.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim()) as {
+        summary?: string;
+        recommendations?: { templateId?: string; reason?: string }[];
+      };
+
+      const picks = (parsed.recommendations || [])
+        .filter((row): row is { templateId: string; reason?: string } => Boolean(row?.templateId))
+        .map((row) => ({ templateId: String(row.templateId), reason: String(row.reason || "") }));
+      const recommendations = applyPicks(catalog, picks);
+      if (recommendations.length < 2) return null;
+
+      return {
+        source: "gemini",
+        summary: String(parsed.summary || "").trim().slice(0, 240) || buildSummary(input),
+        recommendations,
+      };
+    } catch (error) {
+      logger.warn("Gemini recommendation unavailable, using rules", {
+        attempt,
+        error: error instanceof Error ? error.message : error,
       });
-      return null;
+      const aborted =
+        error instanceof Error && /abort|timeout/i.test(`${error.name} ${error.message}`);
+      if (aborted || attempt === 2) return null;
+      await retryPause();
     }
-
-    const payload = (await response.json()) as GeminiPayload;
-    const text = (payload.candidates?.[0]?.content?.parts || [])
-      .map((part) => part.text || "")
-      .join("")
-      .trim();
-    if (!text) return null;
-
-    const parsed = JSON.parse(text.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim()) as {
-      summary?: string;
-      recommendations?: { templateId?: string; reason?: string }[];
-    };
-
-    const picks = (parsed.recommendations || [])
-      .filter((row): row is { templateId: string; reason?: string } => Boolean(row?.templateId))
-      .map((row) => ({ templateId: String(row.templateId), reason: String(row.reason || "") }));
-    const recommendations = applyPicks(catalog, picks);
-    if (recommendations.length < 2) return null;
-
-    return {
-      source: "gemini",
-      summary: String(parsed.summary || "").trim().slice(0, 240) || buildSummary(input),
-      recommendations,
-    };
-  } catch (error) {
-    logger.warn("Gemini recommendation unavailable, using rules", {
-      error: error instanceof Error ? error.message : error,
-    });
-    return null;
   }
+  return null;
 };
 
 export const aiService = {
