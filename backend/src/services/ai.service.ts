@@ -262,7 +262,7 @@ const geminiRecommendation = async (
           contents: [{ role: "user", parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.4,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 768,
             responseMimeType: "application/json",
             responseSchema: {
               type: "object",
@@ -284,7 +284,7 @@ const geminiRecommendation = async (
             },
           },
         }),
-        signal: AbortSignal.timeout(12_000),
+        signal: AbortSignal.timeout(25_000),
       }
     );
 
