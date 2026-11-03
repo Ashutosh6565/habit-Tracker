@@ -270,6 +270,7 @@ const geminiRecommendation = async (
             generationConfig: {
               temperature: 0.4,
               maxOutputTokens: 768,
+              thinkingConfig: { thinkingLevel: "LOW" },
               responseMimeType: "application/json",
               responseSchema: {
                 type: "object",
