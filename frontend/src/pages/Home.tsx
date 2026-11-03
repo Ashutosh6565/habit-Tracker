@@ -6,13 +6,16 @@ import {
   BarChart3,
   Calendar,
   Check,
+  Download,
   Flame,
+  Smartphone,
   Sparkles,
   Star,
   Target,
   Trophy,
   Zap,
 } from "lucide-react";
+import { ANDROID_APK_URL } from "@/lib/appLinks";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StickerField from "@/components/decor/StickerField";
@@ -98,6 +101,14 @@ const Home = () => {
             </div>
 
             <p className="mt-4 text-xs text-muted-foreground">Free forever · No card required · Every template included</p>
+
+            <a
+              href={ANDROID_APK_URL}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              Download the Android app (APK)
+            </a>
 
             <div className="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-border/70 pt-6">
               {[
@@ -247,6 +258,41 @@ const Home = () => {
             >
               Create your free account <ArrowRight className="h-4 w-4" />
             </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Android download */}
+      <section id="download" className="relative border-t border-border/60 py-20 sm:py-24">
+        <div className="container mx-auto max-w-3xl px-4">
+          <motion.div
+            {...fadeUp}
+            className="relative overflow-hidden rounded-3xl border border-border bg-card/60 p-8 text-center sm:p-12"
+          >
+            <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
+            <div className="relative">
+              <span className="sticker-chip border-primary/30 bg-primary/10 text-primary">
+                <Smartphone className="h-3.5 w-3.5" /> Android app
+              </span>
+              <h2 className="mt-5 font-display text-3xl font-bold text-foreground text-balance sm:text-4xl">
+                Your streak, in your pocket.
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-muted-foreground text-balance">
+                Habits, templates, the timetable, analytics and the AI coach — the full Habbiters app, free with no ads.
+              </p>
+              <a
+                href={ANDROID_APK_URL}
+                className="mt-7 inline-flex items-center justify-center gap-2 rounded-xl gradient-primary px-7 py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:opacity-95"
+              >
+                <Download className="h-4 w-4" />
+                Download for Android
+              </a>
+              <p className="mt-3 text-xs text-muted-foreground">Android 7.0+ · 7.4 MB · Direct APK</p>
+              <p className="mx-auto mt-4 max-w-md text-xs text-muted-foreground">
+                Google Play listing is coming soon. While installing, Android may show a Play Protect warning — tap
+                &ldquo;Install anyway&rdquo;.
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>

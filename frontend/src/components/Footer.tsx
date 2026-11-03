@@ -1,5 +1,6 @@
-import { Flame } from "lucide-react";
+import { Download, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ANDROID_APK_URL } from "@/lib/appLinks";
 
 const Footer = () => (
   <footer className="bg-card border-t border-border py-12">
@@ -13,6 +14,12 @@ const Footer = () => (
             <span className="font-display font-bold text-lg text-foreground">Habbiters</span>
           </Link>
           <p className="text-sm text-muted-foreground">Build better habits. Level up your life.</p>
+          <a
+            href={ANDROID_APK_URL}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          >
+            <Download className="h-4 w-4" /> Download for Android
+          </a>
         </div>
         {[
           {
