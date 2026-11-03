@@ -243,8 +243,10 @@ const geminiRecommendation = async (
   // gemini-3.8-flash answers transient 503s under demand spikes, so try twice
   // while keeping the whole call inside a 25s budget.
   const deadline = Date.now() + 25_000;
-  const retryPause = () => new Promise((resolve) => setTimeout(resolve, 800));
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  const maxAttempts = 3;
+  const retryPause = (attempt: number) =>
+    new Promise((resolve) => setTimeout(resolve, 600 * attempt));
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const remaining = deadline - Date.now();
     if (remaining < 1_000) break;
     try {
@@ -304,8 +306,8 @@ const geminiRecommendation = async (
           detail: detail.slice(0, 300),
         });
         const retryable = response.status === 429 || response.status >= 500;
-        if (!retryable || attempt === 2) return null;
-        await retryPause();
+        if (!retryable || attempt === maxAttempts) return null;
+        await retryPause(attempt);
         continue;
       }
 
@@ -339,8 +341,8 @@ const geminiRecommendation = async (
       });
       const aborted =
         error instanceof Error && /abort|timeout/i.test(`${error.name} ${error.message}`);
-      if (aborted || attempt === 2) return null;
-      await retryPause();
+      if (aborted || attempt === maxAttempts) return null;
+      await retryPause(attempt);
     }
   }
   return null;
