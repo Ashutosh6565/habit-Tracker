@@ -240,8 +240,9 @@ const geminiRecommendation = async (
     "Each reason must be one short sentence (max 18 words), concrete and personal. Never invent template ids.",
   ].join("\n");
 
-  // gemini-3.8-flash answers transient 503s under demand spikes, so try twice
-  // while keeping the whole call inside a 25s budget.
+  // The flash model answers 503 while it is saturated, so fall back to the
+  // preview model and keep every attempt inside a 25s budget.
+  const models = [env.gemini.model, "gemini-3-flash-preview"];
   const deadline = Date.now() + 25_000;
   const maxAttempts = 3;
   const retryPause = (attempt: number) =>
@@ -249,9 +250,10 @@ const geminiRecommendation = async (
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const remaining = deadline - Date.now();
     if (remaining < 1_000) break;
+    const model = models[Math.min(attempt - 1, models.length - 1)];
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.gemini.model)}:generateContent`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
         {
           method: "POST",
           headers: {
@@ -303,6 +305,7 @@ const geminiRecommendation = async (
         logger.warn("Gemini recommendation request failed", {
           status: response.status,
           attempt,
+          model,
           detail: detail.slice(0, 300),
         });
         const retryable = response.status === 429 || response.status >= 500;
