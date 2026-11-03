@@ -34,3 +34,17 @@ export const authLimiter = rateLimit({
     },
   },
 });
+
+export const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 40,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: "AI_RATE_LIMITED",
+      message: "The coach is taking a short break. Try again in a few minutes.",
+    },
+  },
+});

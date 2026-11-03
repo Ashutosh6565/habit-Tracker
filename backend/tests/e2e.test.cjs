@@ -21,6 +21,8 @@ process.env.SMTP_HOST = "";
 process.env.SMTP_USER = "";
 process.env.SMTP_PASS = "";
 process.env.BREVO_API_KEY = "";
+// Force the deterministic recommender so the suite never calls a real Gemini key.
+process.env.GEMINI_API_KEY = "";
 
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
@@ -140,6 +142,33 @@ test("habbiters API end-to-end", async (t) => {
 
     premiumTemplateId = templates.find((row) => row.templateId.includes("gym"))?.templateId || templates[0].templateId;
     starterTemplateId = templates[templates.length - 1].templateId;
+  });
+
+  await t.test("AI coach recommends real templates and validates input", async () => {
+    const catalog = await api("/templates/catalog");
+    const ids = new Set(catalog.data.data.templates.map((row) => row.templateId));
+
+    const coach = await api("/ai/recommend", {
+      method: "POST",
+      body: {
+        goal: "I want to sleep better and start running in the morning",
+        focusAreas: ["Sleep", "Fitness"],
+        minutesPerDay: 20,
+        experience: "new",
+      },
+    });
+    assert.equal(coach.status, 200, JSON.stringify(coach.data));
+    assert.equal(coach.data.data.source, "rules");
+    assert.equal(coach.data.data.recommendations.length, 3);
+    assert.ok(coach.data.data.summary.length > 10);
+    for (const pick of coach.data.data.recommendations) {
+      assert.ok(ids.has(pick.templateId), `unknown template ${pick.templateId}`);
+      assert.ok(pick.reason.length > 8);
+      assert.ok(Array.isArray(pick.habits) && pick.habits.length > 0);
+    }
+
+    const invalid = await api("/ai/recommend", { method: "POST", body: {} });
+    assert.equal(invalid.status, 400);
   });
 
   await t.test("any template progress saves for free users", async () => {

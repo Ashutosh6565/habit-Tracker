@@ -128,6 +128,31 @@ export interface TemplateCatalogResponse {
   templates: TemplateCatalogDto[];
 }
 
+export type AiFocusArea =
+  | "Sleep"
+  | "Fitness"
+  | "Focus"
+  | "Study"
+  | "Money"
+  | "Calm"
+  | "Health"
+  | "Creative";
+
+export interface AiRecommendationDto {
+  templateId: string;
+  name: string;
+  description: string;
+  icon: string;
+  habits: { habitId: string; name: string; icon: string }[];
+  reason: string;
+}
+
+export interface AiRecommendResponseDto {
+  source: "gemini" | "rules";
+  summary: string;
+  recommendations: AiRecommendationDto[];
+}
+
 export interface PaymentPlanDto {
   code: PlanCode;
   label: string;
@@ -637,6 +662,19 @@ export const api = {
     upsert(input: TemplateProgressDto) {
       return request("/templates", {
         method: "PUT",
+        body: JSON.stringify(input),
+      });
+    },
+  },
+  ai: {
+    recommend(input: {
+      goal: string;
+      focusAreas: AiFocusArea[];
+      minutesPerDay: number;
+      experience: "new" | "some" | "consistent";
+    }) {
+      return request<AiRecommendResponseDto>("/ai/recommend", {
+        method: "POST",
         body: JSON.stringify(input),
       });
     },

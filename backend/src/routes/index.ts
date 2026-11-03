@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { aiRouter } from "./ai.routes";
 import { analyticsRouter } from "./analytics.routes";
 import { authRouter } from "./auth.routes";
 import { contactRouter } from "./contact.routes";
@@ -26,3 +27,4 @@ apiRouter.use("/contact", contactRouter);
 apiRouter.use("/gamification", gamificationRouter);
 apiRouter.use("/learning", learningRouter);
 apiRouter.use("/planner", plannerRouter);
+apiRouter.use("/ai", aiRouter);

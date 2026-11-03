@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
 import {
   api,
   type AnalyticsOverviewDto,
@@ -11,6 +12,7 @@ import {
   type TemplateCatalogDto,
 } from "@/lib/api";
 import { shiftISO, todayISO } from "./date";
+import { cacheKey, readLocal, writeLocal } from "./localStore";
 import { templateCategory } from "./templates";
 
 export type HabitSummary = { habits: ApiHabit[]; stats: Record<string, number> };
@@ -38,11 +40,15 @@ interface MobileDataValue {
   notes: PlannerNoteDto[];
   time?: PlannerTimeDto;
   isLoading: boolean;
+  offline: boolean;
   toast: string | null;
   notify: (message: string) => void;
   toggleHabit: (habit: ApiHabit) => void;
   createHabit: (draft: HabitDraft) => Promise<void>;
-  applyTemplate: (template: TemplateCatalogDto, habits: { name: string; icon: string }[]) => Promise<number>;
+  applyTemplate: (
+    template: Pick<TemplateCatalogDto, "name" | "description">,
+    habits: { name: string; icon: string }[]
+  ) => Promise<number>;
   toggleTask: (task: PlannerTaskDto) => void;
   addTask: (draft: TaskDraft) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -53,9 +59,60 @@ interface MobileDataValue {
 
 const MobileDataContext = createContext<MobileDataValue | undefined>(undefined);
 
+const loadWithCache = async <T,>(
+  userId: string,
+  name: string,
+  fetcher: () => Promise<T>,
+  setOffline: (value: boolean) => void
+): Promise<T> => {
+  try {
+    const data = await fetcher();
+    writeLocal(userId, cacheKey(name), data);
+    setOffline(false);
+    return data;
+  } catch (error) {
+    const cached = readLocal<T>(userId, cacheKey(name));
+    if (cached) {
+      setOffline(true);
+      return cached;
+    }
+    throw error;
+  }
+};
+
 export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const userId = user?.id || "guest";
   const [toast, setToast] = useState<string | null>(null);
+  const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
+
+  useEffect(() => {
+    const goOnline = () => setOffline(false);
+    const goOffline = () => setOffline(true);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
+
+  const qk = useCallback((name: string) => ["hb", userId, name] as const, [userId]);
+  const cached = useCallback(
+    <T,>(name: string, fetcher: () => Promise<T>) =>
+      () =>
+        loadWithCache(userId, name, fetcher, setOffline),
+    [userId]
+  );
+  const cachedInitial = useCallback(
+    <T,>(name: string) => () => readLocal<T>(userId, cacheKey(name)) ?? undefined,
+    [userId]
+  );
+  const offlineMessage = useCallback(
+    (onlineMessage: string) => (navigator.onLine ? onlineMessage : "You're offline — this change wasn't saved."),
+    []
+  );
 
   const notify = useCallback((message: string) => {
     setToast(message);
@@ -63,60 +120,74 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const summaryQuery = useQuery({
-    queryKey: ["hb", "summary"],
-    queryFn: () => api.habits.summary(),
+    queryKey: qk("summary"),
+    queryFn: cached<HabitSummary>("summary", () => api.habits.summary()),
+    initialData: cachedInitial<HabitSummary>("summary"),
+    initialDataUpdatedAt: 0,
     staleTime: 20_000,
   });
 
   const historyQuery = useQuery({
-    queryKey: ["hb", "history"],
-    queryFn: () => api.habits.history(182),
+    queryKey: qk("history"),
+    queryFn: cached<HabitHistoryDto>("history", () => api.habits.history(182)),
+    initialData: cachedInitial<HabitHistoryDto>("history"),
+    initialDataUpdatedAt: 0,
     staleTime: 60_000,
   });
 
   const analyticsQuery = useQuery({
-    queryKey: ["hb", "analytics"],
-    queryFn: () => api.analytics.overview(),
+    queryKey: qk("analytics"),
+    queryFn: cached<AnalyticsOverviewDto>("analytics", () => api.analytics.overview()),
+    initialData: cachedInitial<AnalyticsOverviewDto>("analytics"),
+    initialDataUpdatedAt: 0,
     staleTime: 60_000,
   });
 
   const templatesQuery = useQuery({
-    queryKey: ["hb", "templates"],
-    queryFn: async () => (await api.templates.catalog()).templates,
+    queryKey: qk("templates"),
+    queryFn: cached<TemplateCatalogDto[]>("templates", async () => (await api.templates.catalog()).templates),
+    initialData: cachedInitial<TemplateCatalogDto[]>("templates"),
+    initialDataUpdatedAt: 0,
     staleTime: 10 * 60_000,
   });
 
   const tasksQuery = useQuery({
-    queryKey: ["hb", "tasks"],
-    queryFn: async () => (await api.planner.tasks({ from: shiftISO(todayISO(), -30), to: shiftISO(todayISO(), 14) })).tasks,
+    queryKey: qk("tasks"),
+    queryFn: cached<PlannerTaskDto[]>("tasks", async () => (await api.planner.tasks({ from: shiftISO(todayISO(), -30), to: shiftISO(todayISO(), 14) })).tasks),
+    initialData: cachedInitial<PlannerTaskDto[]>("tasks"),
+    initialDataUpdatedAt: 0,
     staleTime: 20_000,
   });
 
   const notesQuery = useQuery({
-    queryKey: ["hb", "notes"],
-    queryFn: async () => (await api.planner.notes({ from: shiftISO(todayISO(), -120) })).notes,
+    queryKey: qk("notes"),
+    queryFn: cached<PlannerNoteDto[]>("notes", async () => (await api.planner.notes({ from: shiftISO(todayISO(), -120) })).notes),
+    initialData: cachedInitial<PlannerNoteDto[]>("notes"),
+    initialDataUpdatedAt: 0,
     staleTime: 30_000,
   });
 
   const timeQuery = useQuery({
-    queryKey: ["hb", "time"],
-    queryFn: () => api.planner.time(shiftISO(todayISO(), -97), shiftISO(todayISO(), 14)),
+    queryKey: qk("time"),
+    queryFn: cached<PlannerTimeDto>("time", () => api.planner.time(shiftISO(todayISO(), -97), shiftISO(todayISO(), 14))),
+    initialData: cachedInitial<PlannerTimeDto>("time"),
+    initialDataUpdatedAt: 0,
     staleTime: 30_000,
   });
 
   const refreshDerived = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: ["hb", "summary"] });
-    void queryClient.invalidateQueries({ queryKey: ["hb", "history"] });
-    void queryClient.invalidateQueries({ queryKey: ["hb", "analytics"] });
-  }, [queryClient]);
+    void queryClient.invalidateQueries({ queryKey: qk("summary") });
+    void queryClient.invalidateQueries({ queryKey: qk("history") });
+    void queryClient.invalidateQueries({ queryKey: qk("analytics") });
+  }, [queryClient, qk]);
 
   const toggleMutation = useMutation({
     mutationFn: ({ habit }: { habit: ApiHabit }) => api.habits.setProgress(habit.id, !habit.completed),
     onMutate: async ({ habit }) => {
-      await queryClient.cancelQueries({ queryKey: ["hb", "summary"] });
-      const previous = queryClient.getQueryData<HabitSummary>(["hb", "summary"]);
+      await queryClient.cancelQueries({ queryKey: qk("summary") });
+      const previous = queryClient.getQueryData<HabitSummary>(qk("summary"));
       if (previous) {
-        queryClient.setQueryData<HabitSummary>(["hb", "summary"], {
+        queryClient.setQueryData<HabitSummary>(qk("summary"), {
           stats: previous.stats,
           habits: previous.habits.map((row) =>
             row.id === habit.id
@@ -128,8 +199,8 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       return { previous };
     },
     onError: (_error, _variables, context) => {
-      if (context?.previous) queryClient.setQueryData(["hb", "summary"], context.previous);
-      notify("Could not save that check-in.");
+      if (context?.previous) queryClient.setQueryData(qk("summary"), context.previous);
+      notify(offlineMessage("Could not save that check-in."));
     },
     onSuccess: (updated) => {
       if (!updated.completed) return;
@@ -144,11 +215,17 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       refreshDerived();
       notify("Habit added");
     },
-    onError: () => notify("Could not add that habit."),
+    onError: () => notify(offlineMessage("Could not add that habit.")),
   });
 
   const applyTemplateMutation = useMutation({
-    mutationFn: async ({ template, habits }: { template: TemplateCatalogDto; habits: { name: string; icon: string }[] }) => {
+    mutationFn: async ({
+      template,
+      habits,
+    }: {
+      template: Pick<TemplateCatalogDto, "name" | "description">;
+      habits: { name: string; icon: string }[];
+    }) => {
       const category = templateCategory(template);
       for (const habit of habits) {
         await api.habits.create({ title: habit.name, category, icon: habit.icon, difficulty: "easy" });
@@ -159,38 +236,38 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       refreshDerived();
       notify(`${count} ${count === 1 ? "habit" : "habits"} added from template`);
     },
-    onError: () => notify("Could not add that template. Try again."),
+    onError: () => notify(offlineMessage("Could not add that template. Try again.")),
   });
 
   const taskToggleMutation = useMutation({
     mutationFn: (task: PlannerTaskDto) => api.planner.updateTask(task.id, { completed: !task.completed }),
     onMutate: async (task) => {
-      await queryClient.cancelQueries({ queryKey: ["hb", "tasks"] });
-      const previous = queryClient.getQueryData<PlannerTaskDto[]>(["hb", "tasks"]);
-      queryClient.setQueryData<PlannerTaskDto[]>(["hb", "tasks"], (rows) =>
+      await queryClient.cancelQueries({ queryKey: qk("tasks") });
+      const previous = queryClient.getQueryData<PlannerTaskDto[]>(qk("tasks"));
+      queryClient.setQueryData<PlannerTaskDto[]>(qk("tasks"), (rows) =>
         (rows || []).map((row) => (row.id === task.id ? { ...row, completed: !row.completed } : row))
       );
       return { previous };
     },
     onError: (_error, _task, context) => {
-      if (context?.previous) queryClient.setQueryData(["hb", "tasks"], context.previous);
-      notify("Could not update task.");
+      if (context?.previous) queryClient.setQueryData(qk("tasks"), context.previous);
+      notify(offlineMessage("Could not update task."));
     },
   });
 
   const addTaskMutation = useMutation({
     mutationFn: (draft: TaskDraft) => api.planner.createTask(draft),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["hb", "tasks"] });
+      void queryClient.invalidateQueries({ queryKey: qk("tasks") });
       notify("Task added");
     },
-    onError: () => notify("Could not add task."),
+    onError: () => notify(offlineMessage("Could not add task.")),
   });
 
   const deleteTaskMutation = useMutation({
     mutationFn: (id: string) => api.planner.removeTask(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["hb", "tasks"] });
+      void queryClient.invalidateQueries({ queryKey: qk("tasks") });
       notify("Task removed");
     },
   });
@@ -198,16 +275,16 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
   const addNoteMutation = useMutation({
     mutationFn: ({ text, date }: { text: string; date: string }) => api.planner.createNote({ text, date }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["hb", "notes"] });
+      void queryClient.invalidateQueries({ queryKey: qk("notes") });
       notify("Note saved");
     },
-    onError: () => notify("Could not save note."),
+    onError: () => notify(offlineMessage("Could not save note.")),
   });
 
   const deleteNoteMutation = useMutation({
     mutationFn: (id: string) => api.planner.removeNote(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["hb", "notes"] });
+      void queryClient.invalidateQueries({ queryKey: qk("notes") });
     },
   });
 
@@ -215,9 +292,9 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
     mutationFn: (input: { habitId?: string; label?: string; date: string; slot: number; hours: number }) =>
       api.planner.setTimeCell(input),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["hb", "time"] });
+      void queryClient.invalidateQueries({ queryKey: qk("time") });
     },
-    onError: () => notify("Could not save that time block."),
+    onError: () => notify(offlineMessage("Could not save that time block.")),
   });
 
   const value = useMemo<MobileDataValue>(
@@ -230,6 +307,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       notes: notesQuery.data || [],
       time: timeQuery.data,
       isLoading: summaryQuery.isLoading,
+      offline,
       toast,
       notify,
       toggleHabit: (habit) => toggleMutation.mutate({ habit }),
@@ -252,6 +330,7 @@ export const MobileDataProvider = ({ children }: { children: ReactNode }) => {
       notesQuery.data,
       timeQuery.data,
       summaryQuery.isLoading,
+      offline,
       toast,
       notify,
       toggleMutation,

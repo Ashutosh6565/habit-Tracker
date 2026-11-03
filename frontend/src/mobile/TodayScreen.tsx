@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Bell, Check, ChevronRight, Flame } from "lucide-react";
+import { Bell, Check, ChevronRight, Flame, Sparkles, WifiOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { initials, lastNDays, todayISO, weekOf } from "./date";
 import { DotRow, Loading, Ring, Sheet, WeekStrip } from "./shared";
@@ -7,6 +7,8 @@ import { MomentumCard } from "./MomentumCard";
 import { buildMomentumSeries, computeMomentum, nextMoveFor } from "./momentum";
 import { templateEmoji } from "./templates";
 import { useMobileData } from "./useMobileData";
+import { QuoteCard } from "./QuoteCard";
+import { HealthPulse } from "./HealthPulse";
 
 export const TodayScreen = ({
   onOpenTime,
@@ -15,6 +17,7 @@ export const TodayScreen = ({
   onOpenTemplates,
   onOpenTemplate,
   onOpenTasks,
+  onOpenCoach,
 }: {
   onOpenTime: () => void;
   onOpenAccount: () => void;
@@ -22,9 +25,10 @@ export const TodayScreen = ({
   onOpenTemplates: () => void;
   onOpenTemplate: (templateId: string) => void;
   onOpenTasks: () => void;
+  onOpenCoach: () => void;
 }) => {
   const { user } = useAuth();
-  const { summary, history, tasks, time, templates, isLoading, toggleHabit, notify } = useMobileData();
+  const { summary, history, tasks, time, templates, isLoading, offline, toggleHabit, notify } = useMobileData();
   const [category, setCategory] = useState("All");
   const [showGlance, setShowGlance] = useState(false);
 
@@ -56,6 +60,9 @@ export const TodayScreen = ({
   const firstName = (user?.fullName || "friend").split(" ")[0];
   const completedTasks = todayTasks.filter((task) => task.completed).length;
   const bestStreak = summary?.stats.bestStreak || 0;
+  const movementDone = (summary?.habits || []).filter(
+    (habit) => habit.completed && (habit.category === "Health" || habit.category === "Fitness")
+  ).length;
 
   const momentumInput = {
     habitsDone: done,
@@ -89,6 +96,13 @@ export const TodayScreen = ({
         </button>
       </div>
 
+      {offline && (
+        <div className="hb-offline" role="status">
+          <WifiOff size={13} />
+          Offline — showing the data saved on this device.
+        </div>
+      )}
+
       <WeekStrip days={week} marks={markDays} selected={today} />
 
       <div className="hb-rings">
@@ -110,6 +124,8 @@ export const TodayScreen = ({
         <Ring value={completion / 100} display={`${completion}%`} label="Today" tone="blue" />
       </div>
 
+      <QuoteCard userId={user?.id || "guest"} />
+
       <MomentumCard
         breakdown={momentum}
         series={momentumDays}
@@ -118,6 +134,20 @@ export const TodayScreen = ({
         onOpenTasks={onOpenTasks}
         onOpenTemplates={onOpenTemplates}
       />
+
+      <HealthPulse userId={user?.id || "guest"} movementDone={movementDone} />
+
+      <button type="button" className="hb-coach-card" onClick={onOpenCoach}>
+        <span className="hb-coach-card-orb">
+          <Sparkles size={17} />
+        </span>
+        <span className="hb-coach-card-copy">
+          <span className="hb-kicker">AI coach</span>
+          <strong>Tell me your goal — I'll pick the routine</strong>
+          <span>Matched to your time and level, free</span>
+        </span>
+        <ChevronRight size={16} />
+      </button>
 
       {!!templates?.length && (
         <div className="hb-rail-block">

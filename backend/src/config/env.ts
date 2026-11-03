@@ -57,6 +57,10 @@ export const env = {
     webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || "",
     paymentLink: process.env.RAZORPAY_PAYMENT_LINK || "https://razorpay.me/@ashutoshkumar5863",
   },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || "",
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  },
   supportEmail: process.env.SUPPORT_EMAIL || process.env.SMTP_USER || "support@habbiters.app",
   contactInbox: process.env.CONTACT_INBOX || process.env.ADMIN_EMAIL || process.env.SMTP_USER || "",
   // INR plan prices in paise (₹1 = 100 paise). Premium All ≈ $4/month → ₹349.

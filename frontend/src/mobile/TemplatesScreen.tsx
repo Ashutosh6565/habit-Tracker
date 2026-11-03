@@ -10,9 +10,11 @@ const PAGE_SIZE = 24;
 export const TemplatesScreen = ({
   onBack,
   initialTemplateId,
+  onOpenCoach,
 }: {
   onBack: () => void;
   initialTemplateId?: string | null;
+  onOpenCoach?: () => void;
 }) => {
   const { templates, applyTemplate } = useMobileData();
   const [search, setSearch] = useState("");
@@ -86,6 +88,14 @@ export const TemplatesScreen = ({
         </div>
         <span className="hb-tpl-count">{templates?.length || 105} free</span>
       </div>
+
+      {onOpenCoach && (
+        <button type="button" className="hb-coach-strip" onClick={onOpenCoach}>
+          <Sparkles size={14} />
+          <span>Can't decide? Let the coach pick for you</span>
+          <ChevronRight size={14} />
+        </button>
+      )}
 
       <div className="hb-search">
         <Search size={16} />

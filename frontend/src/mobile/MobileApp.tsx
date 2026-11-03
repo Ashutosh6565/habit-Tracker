@@ -13,6 +13,7 @@ import { AnalyticsScreen } from "./AnalyticsScreen";
 import { TasksScreen } from "./TasksScreen";
 import { CalendarScreen } from "./CalendarScreen";
 import { TemplatesScreen } from "./TemplatesScreen";
+import { AICoachSheet } from "./AICoach";
 import "./mobile.css";
 
 type Screen = "today" | "time" | "analytics" | "tasks" | "calendar" | "templates";
@@ -222,11 +223,16 @@ const MobileShell = () => {
   const [addSheet, setAddSheet] = useState<AddSheet | null>(null);
   const [timeSignal, setTimeSignal] = useState(0);
   const [templatesFocus, setTemplatesFocus] = useState<string | null>(null);
+  const [coachOpen, setCoachOpen] = useState(false);
 
   useEffect(() => {
     setAndroidBackHandler(() => {
       if (addSheet) {
         setAddSheet(null);
+        return true;
+      }
+      if (coachOpen) {
+        setCoachOpen(false);
         return true;
       }
       if (accountOpen) {
@@ -240,7 +246,7 @@ const MobileShell = () => {
       return false;
     });
     return () => setAndroidBackHandler(null);
-  }, [accountOpen, addSheet, screen]);
+  }, [accountOpen, addSheet, coachOpen, screen]);
 
   const go = (next: Screen) => {
     tapFeedback();
@@ -282,6 +288,10 @@ const MobileShell = () => {
               onOpenTemplates={() => openTemplates()}
               onOpenTemplate={(templateId) => openTemplates(templateId)}
               onOpenTasks={() => go("tasks")}
+              onOpenCoach={() => {
+                tapFeedback();
+                setCoachOpen(true);
+              }}
             />
           )}
           {screen === "time" && <TimeScreen onBack={() => go("today")} onOpenCalendar={() => go("calendar")} addSignal={timeSignal} />}
@@ -296,6 +306,10 @@ const MobileShell = () => {
           {screen === "templates" && (
             <TemplatesScreen
               initialTemplateId={templatesFocus}
+              onOpenCoach={() => {
+                tapFeedback();
+                setCoachOpen(true);
+              }}
               onBack={() => {
                 setTemplatesFocus(null);
                 go("today");
@@ -338,6 +352,15 @@ const MobileShell = () => {
       {toast && <div className="hb-toast">{toast}</div>}
 
       {accountOpen && <AccountSheet onClose={() => setAccountOpen(false)} />}
+      {coachOpen && (
+        <AICoachSheet
+          onClose={() => setCoachOpen(false)}
+          onBrowseTemplates={() => {
+            setCoachOpen(false);
+            openTemplates();
+          }}
+        />
+      )}
       {addSheet?.type === "habit" && (
         <HabitSheet
           onClose={() => setAddSheet(null)}

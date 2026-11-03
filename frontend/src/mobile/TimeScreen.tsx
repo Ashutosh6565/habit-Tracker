@@ -1,11 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, Flame, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Bell, BellOff, ChevronLeft, ChevronRight, Clock, Flame, Plus, Trash2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { useMobileData } from "./useMobileData";
-import { hourLabel, shiftISO, shortMonthDay, toISO, todayISO, weekOf } from "./date";
+import { hourLabel, hourValueLabel, shiftISO, shortMonthDay, toISO, todayISO, weekOf } from "./date";
 import { Sheet, WeekStrip } from "./shared";
+import { cancelBlockReminders, reminderPermission, scheduleBlockReminders, syncUpcomingReminders } from "./reminders";
 
 const SLOTS = Array.from({ length: 17 }, (_, index) => index + 6);
 const HOUR_OPTIONS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6];
+const LABELS = ["Focus", "Work", "Study", "Health", "Learning"];
+
+type Editing = { date: string; slot: number; hours: number; label: string; remind: boolean };
+
+const clockTime = (date: Date) => date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+const dayTitle = (iso: string) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
 
 export const TimeScreen = ({
   onBack,
@@ -16,21 +25,50 @@ export const TimeScreen = ({
   onOpenCalendar: () => void;
   addSignal: number;
 }) => {
-  const { time, setTimeCell } = useMobileData();
+  const { user } = useAuth();
+  const userId = user?.id || "guest";
+  const { time, setTimeCell, notify } = useMobileData();
   const [selected, setSelected] = useState(todayISO());
-  const [editing, setEditing] = useState<{ date: string; slot: number; hours: number; label: string } | null>(null);
+  const [editing, setEditing] = useState<Editing | null>(null);
   const [saving, setSaving] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+  const [remindersOn, setRemindersOn] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (addSignal > 0) setEditing({ date: selected, slot: 9, hours: 1, label: "Focus" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addSignal]);
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
+  useEffect(() => {
+    void reminderPermission(false).then(setRemindersOn);
+  }, []);
+
+  const today = todayISO();
+  const currentHour = now.getHours();
   const entries = time?.entries || [];
   const week = useMemo(() => weekOf(selected), [selected]);
   const previousWeek = useMemo(() => weekOf(shiftISO(selected, -7)), [selected]);
-  const today = todayISO();
   const selectedWeekSet = useMemo(() => new Set(week.map(toISO)), [week]);
+
+  useEffect(() => {
+    if (!time?.entries) return;
+    void syncUpcomingReminders(userId, time.entries);
+  }, [time?.entries, userId]);
+
+  useEffect(() => {
+    if (!selectedWeekSet.has(today) || currentHour < 6 || currentHour > 22) return;
+    const timer = window.setTimeout(() => {
+      gridRef.current?.querySelector(".hb-time-row.is-now")?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 400);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (addSignal > 0) setEditing({ date: selected, slot: 9, hours: 1, label: "Focus", remind: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addSignal]);
 
   const weekEntries = entries.filter((entry) => selectedWeekSet.has(entry.date));
   const weekTotal = weekEntries.reduce((sum, entry) => sum + entry.hours, 0);
@@ -40,8 +78,9 @@ export const TimeScreen = ({
     .reduce((sum, entry) => sum + entry.hours, 0);
   const delta = prevTotal ? Math.round(((weekTotal - prevTotal) / prevTotal) * 100) : weekTotal ? 100 : 0;
 
-  const cellHours = (date: string, slot: number) =>
-    entries.filter((entry) => entry.date === date && entry.slot === slot).reduce((sum, entry) => sum + entry.hours, 0);
+  const cellEntries = (date: string, slot: number) =>
+    entries.filter((entry) => entry.date === date && entry.slot === slot && entry.hours > 0);
+  const cellHours = (date: string, slot: number) => cellEntries(date, slot).reduce((sum, entry) => sum + entry.hours, 0);
 
   const dayTotals = week.map((day) => {
     const iso = toISO(day);
@@ -50,8 +89,15 @@ export const TimeScreen = ({
   const peak = Math.max(1, ...dayTotals.map((row) => row.hours));
 
   const selectedSessions = entries
-    .filter((entry) => entry.date === selected)
+    .filter((entry) => entry.date === selected && entry.hours > 0)
     .sort((a, b) => a.slot - b.slot);
+
+  const liveBlock = entries
+    .filter((entry) => entry.date === today && entry.hours > 0 && entry.slot <= currentHour && entry.slot + entry.hours > currentHour)
+    .sort((a, b) => a.slot - b.slot)[0];
+
+  const openEditor = (date: string, slot: number, hours: number, label: string) =>
+    setEditing({ date, slot, hours, label, remind: true });
 
   const saveCell = async () => {
     if (!editing) return;
@@ -61,17 +107,48 @@ export const TimeScreen = ({
         date: editing.date,
         slot: editing.slot,
         hours: editing.hours,
-        label: editing.label,
+        label: editing.label.trim() || "Focus",
       });
+      if (editing.hours <= 0) {
+        await cancelBlockReminders(userId, editing.date, editing.slot);
+        notify("Block cleared");
+      } else if (editing.remind) {
+        const result = await scheduleBlockReminders(
+          userId,
+          { date: editing.date, slot: editing.slot, hours: editing.hours, label: editing.label.trim() || "Focus" },
+          true
+        );
+        void reminderPermission(false).then(setRemindersOn);
+        notify(
+          result.status === "scheduled"
+            ? `Alarms set · ${result.at.map(clockTime).join(" & ")}`
+            : result.status === "denied"
+              ? "Block saved. Allow notifications to get alarms."
+              : result.status === "unsupported"
+                ? "Block saved. Alarms fire in the Android app."
+                : result.status === "failed"
+                  ? "Block saved, but the alarm could not be set."
+                  : "Block saved. That time has already passed."
+        );
+      } else {
+        await cancelBlockReminders(userId, editing.date, editing.slot);
+        notify("Block saved without an alarm");
+      }
       setEditing(null);
+    } catch {
+      // The data layer already shows the failure toast.
     } finally {
       setSaving(false);
     }
   };
 
-  const removeSession = (date: string, slot: number) => {
-    void setTimeCell({ date, slot, hours: 0 });
+  const removeSession = async (date: string, slot: number) => {
+    await cancelBlockReminders(userId, date, slot);
+    await setTimeCell({ date, slot, hours: 0 });
   };
+
+  const endsLabel = editing ? hourValueLabel(editing.slot + editing.hours) : "";
+  const startLabel = editing ? hourValueLabel(editing.slot) : "";
 
   return (
     <div className="hb-screen">
@@ -86,6 +163,25 @@ export const TimeScreen = ({
       </div>
 
       <WeekStrip days={week} selected={selected} onSelect={setSelected} />
+
+      <div className="hb-now-bar">
+        <span className="hb-now-pill">
+          <span className="hb-now-dot" />
+          {clockTime(now)}
+        </span>
+        <span className="hb-now-text" key={liveBlock ? `${liveBlock.date}-${liveBlock.slot}` : "idle"}>
+          {liveBlock ? (
+            <>
+              <strong>{liveBlock.label}</strong> until {hourValueLabel(liveBlock.slot + liveBlock.hours)}
+            </>
+          ) : (
+            "Clock-aligned timetable · alarms set automatically"
+          )}
+        </span>
+        <span className={`hb-now-flag ${remindersOn ? "is-on" : ""}`} title={remindersOn ? "Alarms allowed" : "Alarms not allowed"}>
+          {remindersOn ? <Bell size={13} /> : <BellOff size={13} />}
+        </span>
+      </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "-6px 2px 12px" }}>
         <span className="hb-kicker">
@@ -126,39 +222,61 @@ export const TimeScreen = ({
         <button
           type="button"
           className="hb-chip is-active"
-          onClick={() => setEditing({ date: selected, slot: 9, hours: 1, label: "Focus" })}
+          onClick={() => openEditor(selected, Math.min(22, Math.max(6, currentHour)), 1, "Focus")}
         >
           <Plus size={13} style={{ verticalAlign: "-2px" }} /> Time
         </button>
       </div>
 
-      <div className="hb-grid-wrap">
+      <div className="hb-grid-wrap" ref={gridRef}>
         <div className="hb-grid-head">
           <span />
           {week.map((day) => (
             <span key={toISO(day)}>{day.toLocaleDateString("en-US", { weekday: "short" })}</span>
           ))}
         </div>
-        {SLOTS.map((slot) => (
-          <div key={slot} className="hb-time-row">
-            <span className="hb-time-label">{hourLabel(slot)}</span>
-            {week.map((day) => {
-              const iso = toISO(day);
-              const hours = cellHours(iso, slot);
-              const level = hours >= 3 ? "lvl-3" : hours >= 1.5 ? "lvl-2" : "";
-              return (
-                <button
-                  key={`${iso}-${slot}`}
-                  type="button"
-                  className={`hb-cell ${hours ? `has-hours ${level}` : ""} ${iso === today ? "is-today" : ""}`}
-                  onClick={() => setEditing({ date: iso, slot, hours: hours || 1, label: "Focus" })}
-                >
-                  {hours ? hours : "–"}
-                </button>
-              );
-            })}
-          </div>
-        ))}
+        {SLOTS.map((slot) => {
+          const isNowRow = selectedWeekSet.has(today) && slot === currentHour;
+          return (
+            <div
+              key={slot}
+              className={`hb-time-row ${isNowRow ? "is-now" : ""}`}
+              style={{ animationDelay: `${(slot - 6) * 24}ms` }}
+            >
+              <span className="hb-time-label">
+                {isNowRow && <span className="hb-now-dot" />}
+                {hourLabel(slot)}
+              </span>
+              {week.map((day) => {
+                const iso = toISO(day);
+                const rows = cellEntries(iso, slot);
+                const hours = cellHours(iso, slot);
+                const label = rows[0]?.label || "";
+                const level = hours >= 3 ? "lvl-3" : hours >= 1.5 ? "lvl-2" : "";
+                return (
+                  <button
+                    key={`${iso}-${slot}-${hours}`}
+                    type="button"
+                    className={`hb-cell ${hours ? `has-hours ${level}` : ""} ${iso === today ? "is-today" : ""} ${
+                      iso === today && slot === currentHour ? "is-current" : ""
+                    }`}
+                    title={hours ? `${label} · ${hours}h` : "Add a time block"}
+                    onClick={() => openEditor(iso, slot, hours || 1, label || "Focus")}
+                  >
+                    {hours ? (
+                      <>
+                        <span className="hb-cell-label">{label}</span>
+                        <span className="hb-cell-hours">{hours}h</span>
+                      </>
+                    ) : (
+                      "–"
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
 
       <div className="hb-total">
@@ -198,13 +316,16 @@ export const TimeScreen = ({
               <div style={{ flex: 1 }}>
                 <strong>
                   {session.label} · {hourLabel(session.slot)}
+                  {session.hours !== 1 ? ` – ${hourValueLabel(session.slot + session.hours)}` : ""}
                 </strong>
-                <span>{session.hours}h logged</span>
+                <span>
+                  {session.hours}h logged · {session.date === today ? "today" : dayTitle(session.date)}
+                </span>
               </div>
               <button
                 type="button"
                 className="hb-note-del"
-                onClick={() => removeSession(session.date, session.slot)}
+                onClick={() => void removeSession(session.date, session.slot)}
                 aria-label="Remove time block"
               >
                 <Trash2 size={14} />
@@ -216,13 +337,32 @@ export const TimeScreen = ({
 
       {editing && (
         <Sheet
-          title={`${
-            editing.date === today
-              ? "Today"
-              : new Date(`${editing.date}T12:00:00`).toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" })
-          } · ${hourLabel(editing.slot)}`}
+          title={`${editing.date === today ? "Today" : dayTitle(editing.date)} · ${startLabel}${
+            editing.hours > 0 ? ` – ${endsLabel}` : ""
+          }`}
           onClose={() => setEditing(null)}
         >
+          <span className="hb-sheet-label">Caption</span>
+          <input
+            className="hb-input"
+            value={editing.label}
+            maxLength={24}
+            placeholder="What is this block?"
+            onChange={(event) => setEditing({ ...editing, label: event.target.value })}
+          />
+          <div className="hb-options" style={{ marginTop: 8 }}>
+            {LABELS.map((label) => (
+              <button
+                key={label}
+                type="button"
+                className={`hb-option ${editing.label === label ? "is-active" : ""}`}
+                onClick={() => setEditing({ ...editing, label })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <span className="hb-sheet-label">Hours</span>
           <div className="hb-options">
             {HOUR_OPTIONS.map((hours) => (
@@ -236,21 +376,34 @@ export const TimeScreen = ({
               </button>
             ))}
           </div>
-          <span className="hb-sheet-label">Label</span>
-          <div className="hb-options">
-            {["Focus", "Work", "Study", "Health", "Learning"].map((label) => (
-              <button
-                key={label}
-                type="button"
-                className={`hb-option ${editing.label === label ? "is-active" : ""}`}
-                onClick={() => setEditing({ ...editing, label })}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+
+          {editing.hours > 0 && (
+            <button
+              type="button"
+              className={`hb-remind ${editing.remind ? "is-on" : ""}`}
+              onClick={() => setEditing({ ...editing, remind: !editing.remind })}
+              aria-pressed={editing.remind}
+            >
+              {editing.remind ? <Bell size={16} /> : <BellOff size={16} />}
+              <span className="hb-remind-copy">
+                <strong>Set alarms</strong>
+                <span>
+                  {startLabel}
+                  {editing.hours >= 0.5 ? ` and ${endsLabel}` : ""} — text included in the alert
+                </span>
+              </span>
+              <span className={`hb-toggle ${editing.remind ? "is-on" : ""}`} />
+            </button>
+          )}
+
           <button type="button" className="hb-btn-primary" disabled={saving} onClick={() => void saveCell()}>
-            {saving ? "Saving…" : editing.hours === 0 ? "Clear block" : "Save time block"}
+            {saving
+              ? "Saving…"
+              : editing.hours === 0
+                ? "Clear block"
+                : editing.remind
+                  ? `Save at ${startLabel} & set alarm`
+                  : "Save time block"}
           </button>
         </Sheet>
       )}

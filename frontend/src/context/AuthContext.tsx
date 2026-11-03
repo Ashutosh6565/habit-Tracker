@@ -1,6 +1,33 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { api, type ApiSession, type ApiUser, type SubscriptionInfo, tokenStore } from "@/lib/api";
+import { api, ApiError, type ApiSession, type ApiUser, type SubscriptionInfo, tokenStore } from "@/lib/api";
 import { captureGuestSnapshot, hasGuestData, pushGuestSnapshotToServer } from "@/lib/guestSync";
+
+const CACHED_USER_KEY = "habbiters_cached_user";
+
+const readCachedUser = (): ApiUser | null => {
+  try {
+    const raw = localStorage.getItem(CACHED_USER_KEY);
+    return raw ? (JSON.parse(raw) as ApiUser) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeCachedUser = (user: ApiUser) => {
+  try {
+    localStorage.setItem(CACHED_USER_KEY, JSON.stringify(user));
+  } catch {
+    // profile caching is best-effort
+  }
+};
+
+const clearCachedUser = () => {
+  try {
+    localStorage.removeItem(CACHED_USER_KEY);
+  } catch {
+    // ignore
+  }
+};
 
 type AuthResult = Promise<{ error: Error | null }>;
 
@@ -51,11 +78,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const data = await api.auth.me();
         setUser(data.user);
+        writeCachedUser(data.user);
         setSession(accessToken ? { accessToken, refreshToken: refreshToken || undefined } : null);
-      } catch {
-        tokenStore.clear();
-        setUser(null);
-        setSession(null);
+      } catch (error) {
+        const cached = readCachedUser();
+        const rejected = error instanceof ApiError && (error.status === 401 || error.status === 403);
+        if (cached && !rejected) {
+          // API asleep or offline: keep the user signed in from the saved profile.
+          setUser(cached);
+          setSession(accessToken ? { accessToken, refreshToken: refreshToken || undefined } : null);
+        } else {
+          tokenStore.clear();
+          clearCachedUser();
+          setUser(null);
+          setSession(null);
+        }
       } finally {
         setLoading(false);
       }
@@ -69,6 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await api.auth.signup(fullName, email, password);
       setUser(data.user);
+      writeCachedUser(data.user);
       setSession(data.session);
       syncGuestData(guestSnapshot);
       return { error: null };
@@ -91,6 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await api.auth.verifySignupOtp(fullName, email, password, otp);
       setUser(data.user);
+      writeCachedUser(data.user);
       setSession(data.session);
       syncGuestData(guestSnapshot);
       return { error: null };
@@ -104,6 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await api.auth.login(email, password, rememberMe);
       setUser(data.user);
+      writeCachedUser(data.user);
       setSession(data.session);
       syncGuestData(guestSnapshot);
       return { error: null };
@@ -126,6 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await api.auth.verifyLoginOtp(email, otp, rememberMe);
       setUser(data.user);
+      writeCachedUser(data.user);
       setSession(data.session);
       syncGuestData(guestSnapshot);
       return { error: null };
@@ -135,9 +176,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await api.auth.logout();
-    setUser(null);
-    setSession(null);
+    try {
+      await api.auth.logout();
+    } catch {
+      // Signing out locally must work even when the API is unreachable.
+    } finally {
+      tokenStore.clear();
+      clearCachedUser();
+      setUser(null);
+      setSession(null);
+    }
   };
 
   const refreshSubscription = async () => {

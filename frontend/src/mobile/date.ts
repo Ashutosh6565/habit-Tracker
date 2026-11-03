@@ -71,6 +71,15 @@ export const hourLabel = (slot: number) => {
   return `${hour}${suffix}`;
 };
 
+export const hourValueLabel = (value: number) => {
+  const totalMinutes = Math.round(value * 60);
+  const hours = Math.floor(totalMinutes / 60) % 24;
+  const minutes = ((totalMinutes % 60) + 60) % 60;
+  const suffix = hours < 12 ? "AM" : "PM";
+  const hour = hours % 12 === 0 ? 12 : hours % 12;
+  return `${hour}:${String(minutes).padStart(2, "0")} ${suffix}`;
+};
+
 export const timeLabel = (value?: string | null) => {
   if (!value) return "";
   const [hours, minutes] = value.split(":").map(Number);
