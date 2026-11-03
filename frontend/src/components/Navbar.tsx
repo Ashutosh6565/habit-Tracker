@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "Dashboard", path: "/dashboard" },
   { label: "Tracker", path: "/tracker" },
+  { label: "Timetable", path: "/planner" },
   { label: "Learning", path: "/learning" },
   { label: "Templates", path: "/templates" },
   { label: "Analytics", path: "/analytics" },
@@ -24,6 +25,7 @@ const Navbar = () => {
   const routePermission: Record<string, string> = {
     "/dashboard": "dashboard.view",
     "/tracker": "tracker.view",
+    "/planner": "tracker.view",
     "/learning": "tracker.view",
     "/templates": "templates.view",
     "/analytics": "analytics.view",

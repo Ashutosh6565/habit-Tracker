@@ -70,6 +70,7 @@ const PUBLIC_PAGES: Record<string, Meta> = {
 const PRIVATE_PAGES: Record<string, Meta> = {
   "/dashboard": { title: "Your Dashboard — Habbiters", description: "Your daily habit dashboard.", noindex: true },
   "/tracker": { title: "Habit Tracker — Habbiters", description: "Log today's habits and keep your streak alive.", noindex: true },
+  "/planner": { title: "Timetable — Habbiters", description: "Plan your week in hourly blocks with captions and automatic alarms.", noindex: true },
   "/learning": { title: "Learning Plans — Habbiters", description: "Your learning plans and video routines.", noindex: true },
   "/analytics": { title: "Analytics — Habbiters", description: "Your consistency, trends and time insights.", noindex: true },
   "/gamification": { title: "XP & Achievements — Habbiters", description: "Levels, XP and achievements.", noindex: true },

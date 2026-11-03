@@ -16,6 +16,7 @@ import { usePageMeta } from "@/lib/seo";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Tracker from "./pages/Tracker";
+import Planner from "./pages/Planner";
 import Learning from "./pages/Learning";
 import Templates from "./pages/Templates";
 import Analytics from "./pages/Analytics";
@@ -76,6 +77,7 @@ const AnimatedRoutes = () => {
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<ProtectedRoute permission="dashboard.view"><Dashboard /></ProtectedRoute>} />
             <Route path="/tracker" element={<ProtectedRoute permission="tracker.view" guestAccess><Tracker /></ProtectedRoute>} />
+            <Route path="/planner" element={<ProtectedRoute permission="tracker.view" guestAccess><Planner /></ProtectedRoute>} />
             <Route path="/learning" element={<ProtectedRoute permission="tracker.view" guestAccess><Learning /></ProtectedRoute>} />
             <Route path="/templates" element={<ProtectedRoute permission="templates.view" guestAccess><Templates /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute permission="analytics.view"><Analytics /></ProtectedRoute>} />

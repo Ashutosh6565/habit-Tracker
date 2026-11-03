@@ -17,6 +17,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StickerField from "@/components/decor/StickerField";
 import QuoteMarquee from "@/components/decor/QuoteMarquee";
+import DisciplineQuote from "@/components/DisciplineQuote";
 import StoryJourney from "@/components/decor/StoryJourney";
 import TryHabitDemo from "@/components/decor/TryHabitDemo";
 import CountUp from "@/components/decor/CountUp";
@@ -119,6 +120,26 @@ const Home = () => {
       </section>
 
       <QuoteMarquee />
+
+      {/* Daily discipline note */}
+      <section className="relative pb-6 pt-14 sm:pt-16">
+        <div className="container mx-auto max-w-4xl px-4">
+          <motion.div {...fadeUp}>
+            <div className="mb-5 text-center">
+              <span className="sticker-chip border-primary/30 bg-primary/10 text-primary">
+                <Flame className="h-3.5 w-3.5" /> Discipline, not motivation
+              </span>
+              <h2 className="mt-4 font-display text-3xl font-bold text-foreground text-balance sm:text-4xl">
+                One honest note for the day.
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+                A fresh quote about discipline and why it matters — the same daily note you get inside the app.
+              </p>
+            </div>
+            <DisciplineQuote compact className="mx-auto max-w-3xl" />
+          </motion.div>
+        </div>
+      </section>
 
       {/* Features */}
       <section id="features" className="relative py-20 sm:py-24">

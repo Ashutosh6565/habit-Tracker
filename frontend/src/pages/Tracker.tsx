@@ -10,6 +10,7 @@ import { useHabitContext } from "@/context/HabitContext";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { api, getApiErrorMessage, type ApiHabit } from "@/lib/api";
+import { readCache, writeCache } from "@/lib/offlineCache";
 import { GUEST_TRACKER_HABITS_KEY, readGuestJson } from "@/lib/guestStorage";
 import { tapFeedback } from "@/lib/native";
 
@@ -51,8 +52,12 @@ const Tracker = () => {
   const { user, guestSyncTick } = useAuth();
   const { toast } = useToast();
   const isGuest = !user;
-  const [habits, setHabits] = useState<Habit[]>(() => (user ? [] : loadGuestHabits()));
-  const [loadingHabits, setLoadingHabits] = useState(true);
+  const cacheId = user?.id || "guest";
+  const [cachedHabits] = useState(() => readCache<ApiHabit[]>(cacheId, "tracker-habits"));
+  const [habits, setHabits] = useState<Habit[]>(() =>
+    user ? cachedHabits || [] : loadGuestHabits()
+  );
+  const [loadingHabits, setLoadingHabits] = useState(() => Boolean(user && !cachedHabits));
   const [showAdd, setShowAdd] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDifficulty, setNewDifficulty] = useState<Difficulty>("easy");
@@ -74,15 +79,29 @@ const Tracker = () => {
     const load = async () => {
       setLoadingHabits(true);
       try {
-        setHabits(await api.habits.list());
+        const data = await api.habits.list();
+        setHabits(data);
+        writeCache(cacheId, "tracker-habits", data);
       } catch (error) {
-        toast({ title: "Error loading habits", description: getApiErrorMessage(error), variant: "destructive" });
+        const cached = readCache<ApiHabit[]>(cacheId, "tracker-habits");
+        if (cached) {
+          setHabits(cached);
+          toast({ title: "Showing habits saved on this device", description: "The API is unreachable right now. Changes will retry automatically." });
+        } else {
+          toast({ title: "Error loading habits", description: getApiErrorMessage(error), variant: "destructive" });
+        }
       } finally {
         setLoadingHabits(false);
       }
     };
     load();
-  }, [user, guestSyncTick, toast]);
+  }, [user, guestSyncTick, toast, cacheId]);
+
+  // Keep the signed-in list on disk so a cold start or offline tab still has it.
+  useEffect(() => {
+    if (isGuest || loadingHabits) return;
+    writeCache(cacheId, "tracker-habits", habits);
+  }, [habits, isGuest, loadingHabits, cacheId]);
 
   // Sync tracker habits to shared context
   useEffect(() => {
